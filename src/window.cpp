@@ -12,9 +12,9 @@
 
 namespace Gui
 {
-    Window::Window() : ICompositeGlyph(GlyphParams())
+    Window::Window(const GlyphParams params) : ICompositeGlyph(params)
     {
-        m_window_impl = WindowSystemFactory::Instance().MakeWindowImpl();
+        m_window_impl = WindowSystemFactory::Instance().MakeWindowImpl(params);
         assert(m_window_impl);
     }
 
@@ -50,24 +50,4 @@ namespace Gui
     {
         m_window_impl->FillRectangle(point, width, height, color);
     }
-
-    int Window::GetEvent()
-    {
-        return m_window_impl->GetEvent();
-    }
-
-    void Window::ProcessEvent(int event_type)
-    {
-        for(auto &it: m_components) {
-            if(auto ptr = dynamic_cast<Button*>(it.get())) {
-                if(event_type == 4) {
-                    ptr->OnButtonPressed(this);
-                }
-                else if(event_type == 5) {
-                    ptr->OnButtonReleased(this);
-                }
-            }
-        }
-    }
-
 }
