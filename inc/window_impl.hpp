@@ -17,8 +17,6 @@ public:
     WindowImpl() = default;
     virtual ~WindowImpl() = default;
 
-    // TODO(rmn): this is not right!!!
-    virtual int GetEvent() = 0;
     virtual void DrawRectangle(const Point& point, const width_t width, const height_t height) = 0;
     virtual void DrawText(const Point& text_position, std::string text) = 0;
     virtual void DrawLine(const Point& start_point, const Point& end_point) = 0;

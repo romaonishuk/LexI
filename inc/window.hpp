@@ -11,15 +11,15 @@
 #include "window_impl.hpp"
 #include "types.hpp"
 
+#include "event_manager.hpp"
+
 namespace Gui
 {
     class Window : public ICompositeGlyph
     {
     public:
-        Window();
+        Window(const GlyphParams);
         ~Window();
-
-        int GetEvent();
 
         void Draw(Gui::Window *) override;
         void DrawRectangle(const Point& point, const width_t width, const height_t height) const;
@@ -29,10 +29,16 @@ namespace Gui
         void FillRectangle(const Point& point, const width_t width, const height_t height, const Color color);
         
         void SetForeground(int color) const;
-        void ProcessEvent(int event_type);
+
+        void ProcessEvent(Gui::Window *w,const Point& p, const EventType& ev) {
+            ICompositeGlyph::ProcessEvent(w, p, ev);
+        }
     private:
+        friend EventManager;
 //        class WindowImpl;
         std::unique_ptr<WindowImpl> m_window_impl;
+
+
     };
 }
 
