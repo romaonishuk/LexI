@@ -21,11 +21,17 @@ public:
     explicit IGlyph(const GlyphParams params) : m_params(params){}
     IGlyph(unsigned int x, unsigned int y, width_t w, height_t h) : m_params({x, y, w, h}){}
 
-    using GlyphPtr = std::unique_ptr<IGlyph>;
+    using GlyphPtr = std::shared_ptr<IGlyph>;
     virtual void Draw(Gui::Window *) = 0;  // TODO: const?
     virtual void Insert(GlyphPtr, size_t ) {
 
     }
+
+    bool Intersects(const Point& p) {
+        return m_params.IsIntersects(p);
+    }
+
+    virtual void ProcessEvent(Gui::Window *w, const Point& p, const EventType& ev) = 0;
 
     virtual void Add(GlyphPtr glyph){}
 
@@ -57,14 +63,25 @@ public:
         }
     }
 
-    void Add(std::unique_ptr<IGlyph> glyph) override {
+    void ProcessEvent(Gui::Window *w,const Point& p, const EventType& ev)
+    {
+        if(Intersects(p)) {
+            for(const auto& it: m_components) {
+                if(it->Intersects(p)) {
+                    return it->ProcessEvent(w, p, ev);
+                }
+            }
+        }
+    }
+
+    void Add(GlyphPtr glyph) override {
         m_components.push_back(std::move(glyph));
     }
 
 //    void Remove();
 
 protected:
-    std::list<std::unique_ptr<IGlyph>> m_components;
+    std::list<GlyphPtr> m_components;
 };
 
 #endif //LEXI_I_GLYPH_HPP

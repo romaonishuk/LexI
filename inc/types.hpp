@@ -10,25 +10,18 @@
 using width_t = uint32_t;
 using height_t = uint32_t;
 
-namespace Color
+enum Color
 {
-    const auto kGray = 0xC0C0C0;
-    const auto kWhite = 0xFFFFFF;
-    const auto kBlack = 0x0;
+    kBlack = 0x0,
+    kGray = 0xC0C0C0,
+    kWhite = 0xFFFFFF,
 };
 
-enum class EventTypes
+enum class EventType
 {
-   KeyPressed,
-
-};
-
-struct GlyphParams
-{
-    unsigned int x = 0;
-    unsigned int y = 0;
-    width_t width = 0;
-    height_t height = 0;
+    KeyPressed,
+    ButtonPressed,
+    ButtonReleased
 };
 
 struct Point
@@ -38,6 +31,23 @@ struct Point
 
     bool operator==(const Point& rhs) {
         return x == rhs.x && y == rhs.y;
+    }
+};
+
+struct GlyphParams
+{
+    unsigned int x = 0;
+    unsigned int y = 0;
+    width_t width = 0;
+    height_t height = 0;
+
+    bool IsIntersects(const Point &p) {
+        if(p.x >= x && p.x <= x+width){
+            if(p.y >= y && p.y <= y + height) {
+                return true;
+            }
+        }
+        return false;
     }
 };
 
