@@ -26,8 +26,8 @@ enum class EventType
 
 struct Point
 {
-    unsigned int x = 0;
-    unsigned int y = 0;
+    uint32_t x = 0;
+    uint32_t y = 0;
 
     bool operator==(const Point& rhs) {
         return x == rhs.x && y == rhs.y;
@@ -36,8 +36,8 @@ struct Point
 
 struct GlyphParams
 {
-    unsigned int x = 0;
-    unsigned int y = 0;
+    uint32_t x = 0;
+    uint32_t y = 0;
     width_t width = 0;
     height_t height = 0;
 

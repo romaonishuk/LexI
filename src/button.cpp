@@ -35,8 +35,11 @@ void Button::Draw(Gui::Window *w)
                 {m_params.x + m_params.width, m_params.y + m_params.height});
 
 
-    // TODO: font should be included
-    w->DrawText({m_params.x + m_params.width/2, m_params.y + m_params.height/2}, m_text);
+    // TODO(rmn): font should be included
+    constexpr auto hMagic = 5;
+    constexpr auto wMagic = 10;
+
+    w->DrawText({m_params.x + m_params.width/2 - wMagic, m_params.y + m_params.height/2 + hMagic}, m_text);
 }
 
 void Button::ProcessEvent(Gui::Window *w, const Point& p, const EventType& ev)

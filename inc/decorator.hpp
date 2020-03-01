@@ -8,38 +8,46 @@
 #include "glyphs.hpp"
 #include "window.hpp"
 
+// TODO(rmn): 
+// - use array + templates to remove 
 
-class IDecorator : public IGlyph
+class IDecorator : public ICompositeGlyph
 {
 public:
-    IDecorator(const GlyphParams params, GlyphPtr decorable): 
-                IGlyph(params), m_decorable(std::move(decorable)){}
+    IDecorator(const GlyphParams params): 
+                ICompositeGlyph(params){}
     virtual ~IDecorator() = default;
     // virtual void Draw() = 0;
-
-    void ProcessEvent(Gui::Window *w,const Point& p, const EventType& ev) = 0;
-
-    GlyphPtr m_decorable;
 };
 
 class BorderDecorator : public IDecorator
 {
 public:
-    BorderDecorator(const GlyphParams params, GlyphPtr decorable): IDecorator(params, std::move(decorable)){}
+    BorderDecorator(const GlyphParams params, Color borderColor): 
+    IDecorator(params), 
+    m_color(borderColor) {}
+    
     void Draw(Gui::Window* w) override {
         DrawBorder(w);
     }
 
-    void ProcessEvent(Gui::Window *w,const Point& p, const EventType& ev) {
-        // TODO(rmn):
-        m_decorable->ProcessEvent(w, p, ev);
-    }
+    // void ProcessEvent(Gui::Window *w,const Point& p, const EventType& ev) {
+    //     // TODO(rmn):
+    //     for(const auto& it: m_decorable) {
+    //         it->ProcessEvent(w, p, ev);
+    //     }       
+    // }
 
     void DrawBorder(Gui::Window* w) {
-        m_decorable->Draw(w);
-        w->SetForeground(Color::kBlack);
+        for(const auto& it: m_components) {
+            it->Draw(w);
+        }
+        
+        w->SetForeground(m_color);
         w->DrawRectangle({m_params.x, m_params.y}, m_params.width, m_params.height);
     }
+private:
+    Color m_color;
 };
 
 // class ScrollDecorator : public Decorator

@@ -44,6 +44,7 @@ class ICompositeGlyph: public IGlyph
 {
 public:
     explicit ICompositeGlyph(const GlyphParams params): IGlyph(params) {}
+    
     void Draw(Gui::Window *window) override {
         for(auto &it: m_components) {
             it->Draw(window);
