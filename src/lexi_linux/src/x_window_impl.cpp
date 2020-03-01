@@ -7,15 +7,14 @@
 
 namespace Gui
 {
-XWindowImpl::XWindowImpl()
+XWindowImpl::XWindowImpl(const GlyphParams params)
 {
     m_display = XOpenDisplay(nullptr);
     if (!m_display) {
         throw std::runtime_error("XWindowImpl display initialisation failed!");
     }
 
-    // TODO(rmn): initial parameters!
-    CreateWindow(0, 0, 1028, 480);
+    CreateWindow(params.x, params.y, params.width, params.height);
     CreateGraphicContext();
 
 //    SetForeground(0xA9A9A9);
@@ -25,6 +24,8 @@ XWindowImpl::XWindowImpl()
 
 XWindowImpl::~XWindowImpl()
 {
+    XFreeGC(m_display, m_gc);
+    XDestroyWindow(m_display,m_window);
     XCloseDisplay(m_display);
 
     Logger::Get().Log("Window closed!");
@@ -36,13 +37,17 @@ void XWindowImpl::CreateWindow(unsigned int x, unsigned int y, unsigned int widt
     auto visual = DefaultVisual(m_display, screen);
     auto depth = DefaultDepth(m_display, screen);
     XSetWindowAttributes attributes;
-    attributes.background_pixel = 0xC0C0C0; //XWhitePixel(m_display, screen);
+    attributes.background_pixel =  0xC0C0C0;  // XWhitePixel(m_display, screen);
 
     // TODO(rmn): check errors
     m_window = XCreateWindow(m_display, XRootWindow(m_display, screen), x, y, width, height, 5, depth,
                              InputOutput, visual, CWBackPixel, &attributes);
 
-    XSelectInput(m_display, m_window, ExposureMask | ButtonPress | ButtonRelease | MotionNotify | FocusIn | FocusOut | Expose | GraphicsExpose);
+    Atom wmDeleteMessage = XInternAtom(m_display, "WM_DELETE_WINDOW", False);
+    XSetWMProtocols(m_display, m_window, &wmDeleteMessage, 1);
+
+    // TODO(rmn): this should be moved to event manager
+    XSelectInput(m_display, m_window, ClientMessage | ExposureMask | ButtonPress | ButtonRelease | MotionNotify | FocusIn | FocusOut | Expose | GraphicsExpose);
 
     /*
     TODO(rmn): mb this should be called after all glyphs are drawn?!
@@ -103,16 +108,6 @@ void XWindowImpl::FillRectangle(const Point& point, const width_t width, const h
 {
     SetForeground(color);
     XFillRectangle(m_display, m_window, m_gc, point.x, point.y, width, height);
-}
-
-int XWindowImpl::GetEvent()
-{
-    XEvent event;
-    XNextEvent(m_display, &event);
-
-    return event.type;
-
-//    return std::make_unique<
 }
 
 } // namespace Gui::Window

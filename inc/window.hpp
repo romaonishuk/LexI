@@ -30,7 +30,7 @@ namespace Gui
         
         void SetForeground(int color) const;
 
-        void ProcessEvent(Gui::Window *w,const Point& p, const EventType& ev) {
+        void ProcessEvent(Gui::Window *w, const Point& p, const EventType& ev) {
             ICompositeGlyph::ProcessEvent(w, p, ev);
         }
     private:

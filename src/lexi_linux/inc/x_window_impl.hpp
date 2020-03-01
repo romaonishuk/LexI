@@ -14,7 +14,7 @@ namespace Gui
 class XWindowImpl : public WindowImpl
 {
 public:
-    XWindowImpl();
+    XWindowImpl(const GlyphParams);
     ~XWindowImpl();
 
     void DrawRectangle(const Point& point, const width_t width, const height_t height) override;
@@ -25,8 +25,8 @@ public:
 
     void FillRectangle(const Point& point, const width_t width, const height_t height, const Color color);
 
-    int GetEvent() override;
-private:
+    // TODO(rmn): undo public!!!!
+public:
     void CreateGraphicContext();
 
     void CreateWindow(unsigned int x, unsigned int y, unsigned int width, unsigned int height);
