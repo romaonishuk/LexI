@@ -5,7 +5,7 @@
 #ifndef LEXI_DECORATOR_HPP
 #define LEXI_DECORATOR_HPP
 
-#include "glyphs.hpp"
+#include "i_glyph.hpp"
 #include "window.hpp"
 
 // TODO(rmn): 
@@ -30,13 +30,6 @@ public:
     void Draw(Gui::Window* w) override {
         DrawBorder(w);
     }
-
-    // void ProcessEvent(Gui::Window *w,const Point& p, const EventType& ev) {
-    //     // TODO(rmn):
-    //     for(const auto& it: m_decorable) {
-    //         it->ProcessEvent(w, p, ev);
-    //     }       
-    // }
 
     void DrawBorder(Gui::Window* w) {
         for(const auto& it: m_components) {

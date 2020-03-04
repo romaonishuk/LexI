@@ -5,7 +5,7 @@
 #ifndef LEXI_TEXT_VIEW_HPP
 #define LEXI_TEXT_VIEW_HPP
 
-#include "glyphs.hpp"
+#include "i_glyph.hpp"
 
 class TextView : public ICompositeGlyph
 {

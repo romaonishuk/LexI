@@ -4,7 +4,7 @@
 #ifndef LEXI_TEXT_LABEL_HPP
 #define LEXI_TEXT_LABEL_HPP
 
-#include "glyphs.hpp"
+#include "i_glyph.hpp"
 
 #include <cassert>
 

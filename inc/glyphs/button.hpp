@@ -5,7 +5,7 @@
 #ifndef LEXI_BUTTON_HPP
 #define LEXI_BUTTON_HPP
 
-#include "glyphs.hpp"
+#include "i_glyph.hpp"
 #include <string>
 
 class Button : public IGlyph

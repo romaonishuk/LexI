@@ -1,44 +1,14 @@
 //
-// Created by romaonishuk on 28.10.19.
+// Created by romaonishuk on 04.03.20.
 //
 
-#ifndef LEXI_I_GLYPH_HPP
-#define LEXI_I_GLYPH_HPP
+#ifndef LEXI_I_COMPOSITE_GLYPH_HPP
+#define LEXI_I_COMPOSITE_GLYPH_HPP
 
-#include <memory>
 #include <list>
 #include <string>
 
-#include "types.hpp"
-
-namespace Gui {
-class Window;
-}
-
-class IGlyph
-{
-public:
-    explicit IGlyph(const GlyphParams params) : m_params(params){}
-    IGlyph(unsigned int x, unsigned int y, width_t w, height_t h) : m_params({x, y, w, h}){}
-
-    using GlyphPtr = std::shared_ptr<IGlyph>;
-    virtual void Draw(Gui::Window *) = 0;  // TODO: const?
-    virtual void Insert(GlyphPtr, size_t ) {
-
-    }
-
-    bool Intersects(const Point& p) {
-        return m_params.IsIntersects(p);
-    }
-
-    virtual void ProcessEvent(Gui::Window *w, const Point& p, const EventType& ev) = 0;
-
-    virtual void Add(GlyphPtr glyph){}
-
-    virtual ~IGlyph() = default;
-protected:
-    GlyphParams m_params;
-};
+#include "i_glyph.hpp"
 
 class ICompositeGlyph: public IGlyph
 {
@@ -85,4 +55,4 @@ protected:
     std::list<GlyphPtr> m_components;
 };
 
-#endif //LEXI_I_GLYPH_HPP
+#endif //LEXI_I_COMPOSITE_GLYPH_HPP

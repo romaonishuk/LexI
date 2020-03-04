@@ -8,7 +8,7 @@ set(CMAKE_CXX_FLAGS "-O3 -Werror -Wall")
 
 # interface lib
 add_library(lexi_interface INTERFACE)
-target_include_directories(lexi_interface INTERFACE inc)
+target_include_directories(lexi_interface INTERFACE inc inc/glyphs)
 
 set(PROJECT_SOURCES ${PROJECT_SOURCE_DIR}/src)
 

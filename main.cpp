@@ -2,7 +2,7 @@
 #include <iostream>
 
 #include "window.hpp"
-#include "glyphs.hpp"
+#include "i_glyph.hpp"
 #include "event_manager.hpp"
 #include "button.hpp"
 #include "text_view.hpp"

@@ -6,7 +6,9 @@
 #define LEXI_WINDOW_HPP
 
 #include <memory>
-#include "glyphs.hpp"
+
+#include "i_glyph.hpp"
+#include "i_composite_glyph.hpp"
 // TODO: WindowImpl should be private for Window
 #include "window_impl.hpp"
 #include "types.hpp"
@@ -18,7 +20,7 @@ namespace Gui
     class Window : public ICompositeGlyph
     {
     public:
-        Window(const GlyphParams);
+        explicit Window(const GlyphParams);
         ~Window();
 
         void Draw(Gui::Window *) override;

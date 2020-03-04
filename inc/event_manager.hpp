@@ -11,20 +11,21 @@
 #include <chrono>
 #include <thread>
 
-namespace Gui{
+namespace Gui {
 class Window;
 }
 
 // TODO(rmn): try tio use smtp
-//class IEvent
-//{
-//
-//};
+class IEvent
+{
+private:
+// EventType mType;
+};
 
 class EventManager
 {
 public:
-    EventManager(Gui::Window* window);
+    explicit EventManager(Gui::Window* window);
     void RunLoop();
 
 private:
