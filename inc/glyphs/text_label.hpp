@@ -15,7 +15,7 @@
 class TextLabel : public IGlyph
 {
 public:
-    explicit TextLabel(GlyphParams params, std::string text = "TextLabel") :
+    explicit TextLabel(const GlyphParams& params, const std::string& text = "TextLabel") :
     IGlyph(params), m_text(text)
     {
     }

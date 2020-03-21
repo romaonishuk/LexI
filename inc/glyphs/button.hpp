@@ -11,7 +11,7 @@
 class Button : public IGlyph
 {
 public:
-    explicit Button(GlyphParams params, std::string="Button");
+    explicit Button(GlyphParams params, const std::string& text="Button");
     void Draw(Gui::Window *) override;
     void Add(GlyphPtr) override {}
 

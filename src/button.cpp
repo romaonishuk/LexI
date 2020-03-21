@@ -6,11 +6,8 @@
 
 #include "window.hpp"
 
-// TODO(rmn): tempo
-#include <iostream>
-
 /// ---- Button -------
-Button::Button(GlyphParams params, std::string text) : IGlyph(params)
+Button::Button(GlyphParams params, const std::string& text) : IGlyph(params)
 {
     m_text = text;
 }
@@ -53,13 +50,13 @@ void Button::ProcessEvent(Gui::Window *w, const Point& p, const EventType& ev)
             OnButtonReleased(w);
             break;
         default:
-            std::cout << "Button received event:" << static_cast<int>(ev) << std::endl;
+            // TODO(rmn): add log
             return;
     }
 }
 
 
-void Button::OnButtonPressed(Gui::Window *w) 
+void Button::OnButtonPressed(Gui::Window *w)
 {
     w->SetForeground(Color::kWhite);
 

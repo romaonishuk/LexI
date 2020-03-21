@@ -11,13 +11,14 @@
 class WindowSystemFactory
 {
 public:
-    static WindowSystemFactory& Instance()
+    static WindowSystemFactory& Get()
     {
         static WindowSystemFactory self;
         return self;
     }
 
     std::unique_ptr<Gui::WindowImpl> MakeWindowImpl(const GlyphParams params);
+    std::unique_ptr<Gui::WindowImpl> MakeChildWindowImpl(const GlyphParams params, Gui::WindowImpl *windowImp);
 private:
     WindowSystemFactory() = default;
     ~WindowSystemFactory() = default;

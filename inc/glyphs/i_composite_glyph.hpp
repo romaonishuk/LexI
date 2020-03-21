@@ -21,10 +21,9 @@ public:
         }
     }
 
-    virtual ~ICompositeGlyph() = default;
+    ~ICompositeGlyph() override = default;
 
     void Insert(GlyphPtr glyph, size_t pos) override {
-        // TODO: test me!
         if(pos > m_components.size()) {
             m_components.push_back(std::move(glyph));
         } else {
@@ -34,7 +33,7 @@ public:
         }
     }
 
-    void ProcessEvent(Gui::Window *w,const Point& p, const EventType& ev)
+    void ProcessEvent(Gui::Window *w,const Point& p, const EventType& ev) override
     {
         if(Intersects(p)) {
             for(const auto& it: m_components) {

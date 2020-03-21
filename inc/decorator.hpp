@@ -14,7 +14,7 @@
 class IDecorator : public ICompositeGlyph
 {
 public:
-    IDecorator(const GlyphParams params): 
+    explicit IDecorator(const GlyphParams& params):
                 ICompositeGlyph(params){}
     virtual ~IDecorator() = default;
     // virtual void Draw() = 0;
