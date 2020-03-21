@@ -17,11 +17,14 @@
 
 namespace Gui
 {
+    class ChildWindow;
+
     class Window : public ICompositeGlyph
     {
     public:
-        explicit Window(const GlyphParams);
-        ~Window();
+        explicit Window(const GlyphParams&);
+        Window(const GlyphParams&, std::unique_ptr<WindowImpl>);
+        ~Window() override;
 
         void Draw(Gui::Window *) override;
         void DrawRectangle(const Point& point, const width_t width, const height_t height) const;
@@ -32,15 +35,26 @@ namespace Gui
         
         void SetForeground(int color) const;
 
-        void ProcessEvent(Gui::Window *w, const Point& p, const EventType& ev) {
+        void ProcessEvent(Gui::Window *w, const Point& p, const EventType& ev) override {
             ICompositeGlyph::ProcessEvent(w, p, ev);
         }
-    private:
+
+//    TODO(rmn): protected:
+    public:
         friend EventManager;
 //        class WindowImpl;
         std::unique_ptr<WindowImpl> m_window_impl;
+    };
 
-
+    class ChildWindow : public Window
+    {
+    public:
+        ChildWindow(const GlyphParams&, Window*);
+        void Draw(Window *) override;
+        void Destroy();
+    private:
+        // TODO(rmn): weak_ptr
+        Window* m_parent;
     };
 }
 

@@ -23,6 +23,9 @@ public:
     virtual void FillRectangle(const Point& point, const width_t width, const height_t height, const Color color)= 0;
 
     virtual void SetForeground(const int color) = 0;
+
+    virtual void ShowWindow() = 0;
+    virtual void Destroy() = 0;
 };
 }
 #endif //LEXI_WINDOW_IMPL_HPP

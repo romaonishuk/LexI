@@ -17,8 +17,8 @@ public:
         return self;
     }
 
-    std::unique_ptr<Gui::WindowImpl> MakeWindowImpl(const GlyphParams params);
-    std::unique_ptr<Gui::WindowImpl> MakeChildWindowImpl(const GlyphParams params, Gui::WindowImpl *windowImp);
+    std::unique_ptr<Gui::WindowImpl> MakeWindowImpl(const GlyphParams& params);
+    std::unique_ptr<Gui::WindowImpl> MakeChildWindowImpl(const GlyphParams& params, Gui::WindowImpl *windowImp);
 private:
     WindowSystemFactory() = default;
     ~WindowSystemFactory() = default;

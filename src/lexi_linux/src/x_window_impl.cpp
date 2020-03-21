@@ -7,7 +7,7 @@
 
 namespace Gui
 {
-XWindowImpl::XWindowImpl(const GlyphParams params)
+XWindowImpl::XWindowImpl(const GlyphParams& params)
 {
     m_display = XOpenDisplay(nullptr);
     if (!m_display) {
@@ -22,13 +22,25 @@ XWindowImpl::XWindowImpl(const GlyphParams params)
     Logger::Get().Log("XWindowImpl created!");
 }
 
+// TODO(rmn): refactor this. Testing menu items
+XWindowImpl::XWindowImpl(const GlyphParams params, XWindowImpl* parentImpl):
+    m_display(parentImpl->m_display), m_gc(parentImpl->m_gc)
+{
+    m_is_child = true;
+    m_window = XCreateSimpleWindow(m_display, parentImpl->m_window,
+                                   params.x, params.y, params.height, params.width, 0, 1, 0);
+//    XMapWindow(m_display, m_window);
+}
+
 XWindowImpl::~XWindowImpl()
 {
-    XFreeGC(m_display, m_gc);
     XDestroyWindow(m_display,m_window);
-    XCloseDisplay(m_display);
+    if(!m_is_child) {
+        XFreeGC(m_display, m_gc);
+        XCloseDisplay(m_display);
 
-    Logger::Get().Log("Window closed!");
+        Logger::Get().Log("Window closed!");
+    }
 }
 
 void XWindowImpl::CreateWindow(unsigned int x, unsigned int y, unsigned int width, unsigned int height)
@@ -47,7 +59,10 @@ void XWindowImpl::CreateWindow(unsigned int x, unsigned int y, unsigned int widt
     XSetWMProtocols(m_display, m_window, &wmDeleteMessage, 1);
 
     // TODO(rmn): this should be moved to event manager
-    XSelectInput(m_display, m_window, ClientMessage | ExposureMask | ButtonPress | ButtonRelease | MotionNotify | FocusIn | FocusOut | Expose | GraphicsExpose);
+    XSelectInput(m_display, m_window, ClientMessage | ExposureMask |
+                                       ButtonPress | ButtonRelease | MotionNotify |
+                                       FocusIn | FocusOut | Expose | GraphicsExpose |
+                                       CreateNotify | DestroyNotify);
 
     /*
     TODO(rmn): mb this should be called after all glyphs are drawn?!
@@ -108,6 +123,16 @@ void XWindowImpl::FillRectangle(const Point& point, const width_t width, const h
 {
     SetForeground(color);
     XFillRectangle(m_display, m_window, m_gc, point.x, point.y, width, height);
+}
+
+void XWindowImpl::ShowWindow()
+{
+    XMapWindow(m_display, m_window);
+}
+
+void XWindowImpl::Destroy()
+{
+    XDestroyWindow(m_display, m_window);
 }
 
 } // namespace Gui::Window

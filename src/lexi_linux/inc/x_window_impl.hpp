@@ -14,8 +14,9 @@ namespace Gui
 class XWindowImpl : public WindowImpl
 {
 public:
-    XWindowImpl(const GlyphParams);
-    ~XWindowImpl();
+    explicit XWindowImpl(const GlyphParams&);
+    explicit XWindowImpl(const GlyphParams, XWindowImpl*);
+    ~XWindowImpl() override;
 
     void DrawRectangle(const Point& point, const width_t width, const height_t height) override;
     void DrawText(const Point& text_position, std::string text) override;
@@ -25,7 +26,8 @@ public:
 
     void FillRectangle(const Point& point, const width_t width, const height_t height, const Color color);
 
-    // TODO(rmn): undo public!!!!
+    void ShowWindow() override;
+    void Destroy() override;
 public:
     void CreateGraphicContext();
 
@@ -34,6 +36,9 @@ public:
     ::Display *m_display;
     ::Window m_window;
     ::GC m_gc;
+
+    // TODO(rmn): wip change
+    bool m_is_child = false;
 };
 }
 
