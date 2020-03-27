@@ -15,12 +15,6 @@ namespace Gui {
 class Window;
 }
 
-// TODO(rmn): try tio use smtp
-class IEvent
-{
-private:
-// EventType mType;
-};
 
 class EventManager
 {
