@@ -18,8 +18,8 @@ namespace Gui
         assert(m_window_impl);
     }
 
-    Window::Window(const GlyphParams& params, std::unique_ptr<WindowImpl> impl):ICompositeGlyph(params),
-        m_window_impl(std::move(impl))
+    Window::Window(const GlyphParams& params, Window* parentWindow):ICompositeGlyph(params),
+        m_window_impl(WindowSystemFactory::Get().MakeChildWindowImpl(params, parentWindow->m_window_impl.get()))
     {
 
     }
@@ -57,18 +57,25 @@ namespace Gui
         m_window_impl->FillRectangle(point, width, height, color);
     }
 
+    void Window::ShowWindow() const
+    {
+        m_window_impl->ShowWindow();
+    }
+
+    void Window:: HideWindow() const
+    {
+        m_window_impl->HideWindow();
+    }
+
 // --- ChildWindow ---
     ChildWindow::ChildWindow(const GlyphParams& params, Window* parent):
-        Window(params, WindowSystemFactory::Get().MakeChildWindowImpl(params, parent->m_window_impl.get())),
+        Window(params, parent),
         m_parent(parent)
     {
     }
 
-    void ChildWindow::Draw(Gui::Window *) {
-        m_window_impl->ShowWindow();
-    }
-
-    void ChildWindow::Destroy() {
-        m_window_impl->Destroy();
+    void ChildWindow::Draw([[maybe_unused]] Gui::Window *w) {
+        m_window_impl->SetForeground(kBlack);
+        Gui::Window::Draw(this);
     }
 }

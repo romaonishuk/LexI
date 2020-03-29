@@ -34,8 +34,8 @@ XWindowImpl::XWindowImpl(const GlyphParams params, XWindowImpl* parentImpl):
 
 XWindowImpl::~XWindowImpl()
 {
-    XDestroyWindow(m_display,m_window);
     if(!m_is_child) {
+        XDestroyWindow(m_display, m_window);
         XFreeGC(m_display, m_gc);
         XCloseDisplay(m_display);
 
@@ -62,16 +62,8 @@ void XWindowImpl::CreateWindow(unsigned int x, unsigned int y, unsigned int widt
     XSelectInput(m_display, m_window, ClientMessage | ExposureMask |
                                        ButtonPress | ButtonRelease | MotionNotify |
                                        FocusIn | FocusOut | Expose | GraphicsExpose |
-                                       CreateNotify | DestroyNotify);
+                                       CreateNotify | DestroyNotify | SubstructureNotifyMask);
 
-    /*
-    TODO(rmn): mb this should be called after all glyphs are drawn?!
-    When windows are first created, they are not visible (not mapped) on the screen. 
-    Any output to a window that is not visible on the screen and that does not have backing store will be discarded. 
-    An application may wish to create a window long before it is mapped to the screen. 
-    When a window is eventually mapped to the screen (using XMapWindow()), the X server generates an 
-    Expose event for the window if backing store has not been maintained.
-    */
     /* make the window actually appear on the screen. */
     XMapWindow(m_display, m_window);
 
@@ -130,9 +122,9 @@ void XWindowImpl::ShowWindow()
     XMapWindow(m_display, m_window);
 }
 
-void XWindowImpl::Destroy()
+void XWindowImpl::HideWindow()
 {
-    XDestroyWindow(m_display, m_window);
+    XUnmapWindow(m_display, m_window);
 }
 
 } // namespace Gui::Window

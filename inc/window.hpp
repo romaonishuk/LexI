@@ -23,7 +23,7 @@ namespace Gui
     {
     public:
         explicit Window(const GlyphParams&);
-        Window(const GlyphParams&, std::unique_ptr<WindowImpl>);
+        Window(const GlyphParams&, Window*);
         ~Window() override;
 
         void Draw(Gui::Window *) override;
@@ -39,10 +39,11 @@ namespace Gui
             ICompositeGlyph::ProcessEvent(w, p, ev);
         }
 
-//    TODO(rmn): protected:
-    public:
+        void ShowWindow() const;
+        void HideWindow() const;
+
+    protected:
         friend EventManager;
-//        class WindowImpl;
         std::unique_ptr<WindowImpl> m_window_impl;
     };
 
@@ -51,7 +52,6 @@ namespace Gui
     public:
         ChildWindow(const GlyphParams&, Window*);
         void Draw(Window *) override;
-        void Destroy();
     private:
         // TODO(rmn): weak_ptr
         Window* m_parent;

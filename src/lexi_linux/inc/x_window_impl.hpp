@@ -24,11 +24,20 @@ public:
 
     void SetForeground(const int color) override;
 
-    void FillRectangle(const Point& point, const width_t width, const height_t height, const Color color);
+    void FillRectangle(const Point& point, const width_t width, const height_t height, const Color color) override;
 
     void ShowWindow() override;
-    void Destroy() override;
-public:
+    void HideWindow() override;
+
+    unsigned long GetWindow() const  override {
+        return m_window;
+    }
+
+    void* GetDisplay() const override {
+        return m_display;
+    }
+
+private:
     void CreateGraphicContext();
 
     void CreateWindow(unsigned int x, unsigned int y, unsigned int width, unsigned int height);
@@ -37,7 +46,7 @@ public:
     ::Window m_window;
     ::GC m_gc;
 
-    // TODO(rmn): wip change
+    // TODO(rmn): WIP change
     bool m_is_child = false;
 };
 }

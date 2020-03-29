@@ -25,7 +25,11 @@ public:
     virtual void SetForeground(const int color) = 0;
 
     virtual void ShowWindow() = 0;
-    virtual void Destroy() = 0;
+    virtual void HideWindow() = 0;
+
+    // TODO(rmn): Wrap
+    virtual unsigned long GetWindow() const = 0;
+    virtual void* GetDisplay() const = 0;
 };
 }
 #endif //LEXI_WINDOW_IMPL_HPP
