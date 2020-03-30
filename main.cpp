@@ -24,7 +24,7 @@ int main()
     
     Gui::Window window(initial_window_params);
     EventManager eventManager(&window);
-    eventManager.addChildWindow(&window);
+    eventManager.addWindow(&window);
 
     auto top_panel = std::make_shared<BorderDecorator>(GlyphParams{0, 0, initial_window_params.width, 50}, Color::kWhite);
     window.Add(top_panel);
@@ -52,6 +52,6 @@ int main()
     bottom_panel->Add(std::make_shared<TextLabel>(GlyphParams{100, 1010, 100, 20}, "This is status line!"));
     window.Add(bottom_panel);
 
-    eventManager.addChildWindow(fileMenu->getMenuWindow());
+    eventManager.addWindow(fileMenu->getMenuWindow());
     eventManager.RunLoop();
 }

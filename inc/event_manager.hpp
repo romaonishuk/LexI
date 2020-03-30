@@ -16,15 +16,24 @@ class Window;
 }
 
 
+// TODO(rmn): make singleton
 class EventManager
 {
 public:
     explicit EventManager(Gui::Window* window);
     void RunLoop();
-
+    void Stop();
+    void addWindow(Gui::Window* w) {
+        childWindows.push_back(w);
+    }
 private:
 //    std::queue<std::unique_ptr<IEvent>> m_queue;
-    Gui::Window *m_window;
+    std::vector<Gui::Window*> childWindows;
+    Gui::Window *m_mainWindow;
+    Gui::Window *m_currentWindow;
+    bool stopLoop = false;
+
+    bool ChangeCurrentWindow(unsigned long window);
 };
 
 #endif //LEXI_EVENT_MANAGER_HPP
