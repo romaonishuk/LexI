@@ -32,6 +32,12 @@ namespace Gui
         ICompositeGlyph::Draw(window);
     }
 
+    void Window::ReDraw()
+    {
+        m_window_impl->ClearWindow();
+        Gui::Window::Draw(this);
+    }
+
     void Window::SetForeground(int color) const
     {
         m_window_impl->SetForeground(color);

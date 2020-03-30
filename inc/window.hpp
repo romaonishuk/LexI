@@ -27,16 +27,21 @@ namespace Gui
         ~Window() override;
 
         void Draw(Gui::Window *) override;
+        void ReDraw();
         void DrawRectangle(const Point& point, const width_t width, const height_t height) const;
         void DrawText(const Point& text_position, std::string text) const;
         void DrawLine(const Point& start_point, const Point& end_point) const;
-        
+
         void FillRectangle(const Point& point, const width_t width, const height_t height, const Color color);
         
         void SetForeground(int color) const;
 
         void ProcessEvent(Gui::Window *w, const Point& p, const EventType& ev) override {
-            ICompositeGlyph::ProcessEvent(w, p, ev);
+            for(const auto& it: m_components) {
+                if(it->Intersects(p)) {
+                    return it->ProcessEvent(w, p, ev);
+                }
+            }
         }
 
         void ShowWindow() const;

@@ -3,6 +3,7 @@
 //
 
 #include "menu.hpp"
+#include "i_command.hpp"
 
 // TODO(rmn): remove copy-paste
 
@@ -10,12 +11,13 @@
 namespace Gui {
     Menu::Menu(const GlyphParams &p, const std::string& title, Window*w) :
         ICompositeGlyph(p),
-        mMenuWindow(std::make_unique<ChildWindow>(GlyphParams{365, 55, 280, 240}, w)),
+        mMenuWindow(std::make_unique<ChildWindow>(GlyphParams{p.x, p.y + p.height, 200, 50}, w)),
         m_title(title) {
 
     }
 
-    void Menu::Draw(Window *w) {
+    void Menu::Draw(Window *w)
+    {
         w->SetForeground(kBlack);
         constexpr auto hMagic = 5;
         constexpr auto wMagic = 10;
@@ -24,7 +26,8 @@ namespace Gui {
         w->DrawRectangle({m_params.x, m_params.y}, m_params.width, m_params.height);
     }
 
-    void Menu::ProcessEvent(Window *w, const Point &p, const EventType &ev) {
+    void Menu::ProcessEvent(Window *w, const Point &p, const EventType &ev)
+    {
         if (ev == EventType::ButtonPressed) {
             for(auto&it : m_components) {
                 mMenuWindow->Add(it);
@@ -39,66 +42,4 @@ namespace Gui {
     {
         mMenuWindow->Add(std::move(glyph));
     }
-
-    // --- MenuItem ---
-
-    void MenuItem::Draw(Window * w)
-    {
-        w->SetForeground(Color::kWhite);
-
-        // top
-        w->DrawLine({m_params.x, m_params.y}, {m_params.x + m_params.width, m_params.y});
-        // left
-        w->DrawLine({m_params.x, m_params.y}, {m_params.x, m_params.y + m_params.height});
-
-        w->SetForeground(Color::kBlack);
-
-        // bottom
-        w->DrawLine({m_params.x, m_params.y + m_params.height},
-                    {m_params.x + m_params.width, m_params.y + m_params.height});
-
-        // right
-        w->DrawLine({m_params.x + m_params.width, m_params.y},
-                    {m_params.x + m_params.width, m_params.y + m_params.height});
-
-
-        // TODO(rmn): font should be included
-        constexpr auto hMagic = 5;
-        constexpr auto wMagic = 10;
-
-        w->DrawText({m_params.x + m_params.width/2 - wMagic, m_params.y + m_params.height/2 + hMagic}, m_text);
-    }
-
-    void MenuItem::ProcessEvent(Window *w,const Point& p, const EventType& ev)
-    {
-        switch(ev)
-        {
-            case EventType::ButtonPressed:
-                w->SetForeground(Color::kWhite);
-
-                // bottom
-                w->DrawLine({m_params.x, m_params.y + m_params.height},
-                            {m_params.x + m_params.width, m_params.y + m_params.height});
-                // right
-                w->DrawLine({m_params.x + m_params.width, m_params.y},
-                            {m_params.x + m_params.width, m_params.y + m_params.height});
-
-                w->SetForeground(Color::kBlack);
-
-                // top
-                w->DrawLine({m_params.x, m_params.y}, {m_params.x + m_params.width, m_params.y});
-                // left
-                w->DrawLine({m_params.x, m_params.y}, {m_params.x, m_params.y + m_params.height});
-
-                w->SetForeground(Color::kGray);
-                break;
-            case EventType::ButtonReleased:
-                Draw(w);
-                break;
-            default:
-                // TODO(rmn): add log
-                return;
-        }
-    }
-
 }

@@ -8,6 +8,8 @@
 // TODO(rmn): need to investigate how this will be implemented on another OS
 #include "window.hpp"
 
+class ICommand;
+
 namespace Gui
 {
 class Menu : public ICompositeGlyph
@@ -27,21 +29,6 @@ public:
 private:
     std::unique_ptr<ChildWindow> mMenuWindow = nullptr;
     std::string m_title;
-};
-
-class MenuItem : public IGlyph
-{
-public:
-    explicit MenuItem(const GlyphParams params, const std::string& text) : IGlyph(params), m_text(text) {
-
-    }
-
-    void Draw(Window * w) override;
-
-    void ProcessEvent(Window *w,const Point& p, const EventType& ev) override;
-
-private:
-    std::string m_text;
 };
 }  // namespace Gui
 

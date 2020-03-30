@@ -34,7 +34,7 @@ XWindowImpl::XWindowImpl(const GlyphParams params, XWindowImpl* parentImpl):
     XSelectInput(m_display, m_window, ClientMessage | ExposureMask |
                                       ButtonPress | ButtonRelease | MotionNotify |
                                       FocusIn | FocusOut | Expose | GraphicsExpose |
-                                      CreateNotify | DestroyNotify | SubstructureNotifyMask);
+                                      CreateNotify | DestroyNotify | SubstructureNotifyMask | PointerMotionMask);
 //
 //    XFlush(m_display);
 }
@@ -132,6 +132,11 @@ void XWindowImpl::ShowWindow()
 void XWindowImpl::HideWindow()
 {
     XUnmapWindow(m_display, m_window);
+}
+
+void XWindowImpl::ClearWindow()
+{
+    XClearWindow(m_display, m_window);
 }
 
 } // namespace Gui::Window

@@ -3,6 +3,7 @@
 //
 
 #include <stdint.h>
+#include <omp.h>
 
 #ifndef LEXI_TYPES_HPP
 #define LEXI_TYPES_HPP
@@ -15,13 +16,16 @@ enum Color
     kBlack = 0x0,
     kGray = 0xC0C0C0,
     kWhite = 0xFFFFFF,
+    kBlue = 0x0000FF,
+    kLightBlue = 0xD6EBFF
 };
 
 enum class EventType
 {
     KeyPressed,
     ButtonPressed,
-    ButtonReleased
+    ButtonReleased,
+    FocusedIn
 };
 
 struct Point
@@ -48,6 +52,10 @@ struct GlyphParams
             }
         }
         return false;
+    }
+
+    operator Point() const {
+        return {x, y};
     }
 };
 

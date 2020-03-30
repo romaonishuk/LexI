@@ -37,6 +37,7 @@ public:
         return m_display;
     }
 
+    void ClearWindow() override;
 private:
     void CreateGraphicContext();
 
