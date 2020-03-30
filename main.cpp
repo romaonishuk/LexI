@@ -27,6 +27,11 @@ int main()
     top_panel->Add(std::make_shared<Button>(GlyphParams{95, 5, 80, 40}, "Edit"));
     top_panel->Add(std::make_shared<Button>(GlyphParams{185, 5, 80, 40}, "Style"));
     top_panel->Add(std::make_shared<Button>(GlyphParams{275, 5, 80, 40}, "Symbol"));
+
+    auto menu = std::make_shared<Gui::Menu>(GlyphParams{365, 5, 200, 90}, "Menu", &window);
+    menu->Add(std::make_shared<Gui::MenuItem>(GlyphParams{0, 0, 200, 40}, "Item1"));
+    menu->Add(std::make_shared<Gui::MenuItem>(GlyphParams{0, 40, 200, 40}, "Item2"));
+    top_panel->Add(menu);
     window.Add(top_panel);
 
     auto text_view_border = std::make_shared<BorderDecorator>(GlyphParams{40, 100, 700, 800}, Color::kBlack);
@@ -41,5 +46,6 @@ int main()
     window.Add(bottom_panel);
 
     EventManager eventManager(&window);
+    eventManager.addChildWindow(menu->getMenuWindow());
     eventManager.RunLoop();
 }

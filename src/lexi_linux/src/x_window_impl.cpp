@@ -28,8 +28,15 @@ XWindowImpl::XWindowImpl(const GlyphParams params, XWindowImpl* parentImpl):
 {
     m_is_child = true;
     m_window = XCreateSimpleWindow(m_display, parentImpl->m_window,
-                                   params.x, params.y, params.height, params.width, 0, 1, 0);
-//    XMapWindow(m_display, m_window);
+                                   params.x, params.y, params.width, params.height, 0, 1, 0xC0C0C0);
+
+    // TODO(rmn): investigate event propagation
+    XSelectInput(m_display, m_window, ClientMessage | ExposureMask |
+                                      ButtonPress | ButtonRelease | MotionNotify |
+                                      FocusIn | FocusOut | Expose | GraphicsExpose |
+                                      CreateNotify | DestroyNotify | SubstructureNotifyMask);
+//
+//    XFlush(m_display);
 }
 
 XWindowImpl::~XWindowImpl()
@@ -79,8 +86,8 @@ void XWindowImpl::CreateGraphicContext()
     int join_style = JoinBevel;     /*  joined lines.		*/
 
     m_gc = XCreateGC(m_display, m_window, 0, nullptr);
-    if (m_gc < 0) {
-        throw std::string("XCreateGC filed!");
+    if (m_gc == nullptr) {
+        throw std::runtime_error("XCreateGC failed!");
     }
 
     /* define the style of lines that will be drawn using this GC. */
