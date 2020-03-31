@@ -9,9 +9,8 @@
 
 #include <X11/Xlib.h>
 
-namespace Gui
-{
-class XWindowImpl : public WindowImpl
+namespace Gui {
+class XWindowImpl: public WindowImpl
 {
 public:
     explicit XWindowImpl(const GlyphParams&);
@@ -29,27 +28,24 @@ public:
     void ShowWindow() override;
     void HideWindow() override;
 
-    unsigned long GetWindow() const  override {
-        return m_window;
-    }
+    unsigned long GetWindow() const override { return m_window; }
 
-    void* GetDisplay() const override {
-        return m_display;
-    }
+    void* GetDisplay() const override { return m_display; }
 
     void ClearWindow() override;
+
 private:
     void CreateGraphicContext();
 
     void CreateWindow(unsigned int x, unsigned int y, unsigned int width, unsigned int height);
 
-    ::Display *m_display;
+    ::Display* m_display;
     ::Window m_window;
     ::GC m_gc;
 
     // TODO(rmn): WIP change
     bool m_is_child = false;
 };
-}
+}  // namespace Gui
 
-#endif //LEXI_X_WINDOW_IMPL_CPP_HPP
+#endif  // LEXI_X_WINDOW_IMPL_CPP_HPP

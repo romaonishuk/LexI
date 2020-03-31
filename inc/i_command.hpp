@@ -23,23 +23,19 @@ public:
 
 #include "event_manager.hpp"
 
-class QuitCommand : public ICommand
+class QuitCommand: public ICommand
 {
 public:
-    explicit QuitCommand(EventManager* manager): m_manager(manager) {
+    explicit QuitCommand(EventManager* manager): m_manager(manager) {}
 
-    }
+    ExecutionResult Execute() override;
 
-    ExecutionResult Execute() override ;
+    ExecutionResult UnExecute() override { return ExecutionResult::kFailure; }
 
-    ExecutionResult UnExecute() override { 
-        return ExecutionResult::kFailure;
-    }
-
-    bool IsReversible() override {return false;}
+    bool IsReversible() override { return false; }
 
 private:
     EventManager* m_manager;
 };
 
-#endif //LEXI_I_COMMAND_HPP
+#endif  // LEXI_I_COMMAND_HPP

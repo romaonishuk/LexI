@@ -2,8 +2,8 @@
 // Created by romaonishuk on 01.12.19.
 //
 
-#include <stdint.h>
 #include <omp.h>
+#include <stdint.h>
 
 #ifndef LEXI_TYPES_HPP
 #define LEXI_TYPES_HPP
@@ -33,9 +33,7 @@ struct Point
     uint32_t x = 0;
     uint32_t y = 0;
 
-    bool operator==(const Point& rhs) {
-        return x == rhs.x && y == rhs.y;
-    }
+    bool operator==(const Point& rhs) { return x == rhs.x && y == rhs.y; }
 };
 
 struct GlyphParams
@@ -45,8 +43,9 @@ struct GlyphParams
     width_t width = 0;
     height_t height = 0;
 
-    bool IsIntersects(const Point &p) {
-        if(p.x >= x && p.x <= x+width){
+    bool IsIntersects(const Point& p)
+    {
+        if(p.x >= x && p.x <= x + width) {
             if(p.y >= y && p.y <= y + height) {
                 return true;
             }
@@ -54,9 +53,7 @@ struct GlyphParams
         return false;
     }
 
-    operator Point() const {
-        return {x, y};
-    }
+    operator Point() const { return {x, y}; }
 };
 
-#endif //LEXI_TYPES_HPP
+#endif  // LEXI_TYPES_HPP

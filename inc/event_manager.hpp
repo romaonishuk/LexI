@@ -6,15 +6,14 @@
 #define LEXI_EVENT_MANAGER_HPP
 
 #include <cassert>
+#include <chrono>
 #include <memory>
 #include <queue>
-#include <chrono>
 #include <thread>
 
 namespace Gui {
 class Window;
 }
-
 
 // TODO(rmn): make singleton
 class EventManager
@@ -23,17 +22,16 @@ public:
     explicit EventManager(Gui::Window* window);
     void RunLoop();
     void Stop();
-    void addWindow(Gui::Window* w) {
-        childWindows.push_back(w);
-    }
+    void addWindow(Gui::Window* w) { childWindows.push_back(w); }
+
 private:
-//    std::queue<std::unique_ptr<IEvent>> m_queue;
+    //    std::queue<std::unique_ptr<IEvent>> m_queue;
     std::vector<Gui::Window*> childWindows;
-    Gui::Window *m_mainWindow;
-    Gui::Window *m_currentWindow;
+    Gui::Window* m_mainWindow;
+    Gui::Window* m_currentWindow;
     bool stopLoop = false;
 
     bool ChangeCurrentWindow(unsigned long window);
 };
 
-#endif //LEXI_EVENT_MANAGER_HPP
+#endif  // LEXI_EVENT_MANAGER_HPP

@@ -10,26 +10,24 @@
 
 class ICommand;
 
-namespace Gui
-{
-class Menu : public ICompositeGlyph
+namespace Gui {
+class Menu: public ICompositeGlyph
 {
 public:
     explicit Menu(const GlyphParams& p, const std::string& title, Window* w);
 
-    void Draw(Window * w) override;
+    void Draw(Window* w) override;
 
-    void ProcessEvent(Window *w,const Point& p, const EventType& ev) override;
+    void ProcessEvent(Window* w, const Point& p, const EventType& ev) override;
 
     void Add(GlyphPtr glyph) override;
 
-    ChildWindow* getMenuWindow() {
-        return mMenuWindow.get();
-    }
+    ChildWindow* getMenuWindow() { return mMenuWindow.get(); }
+
 private:
     std::unique_ptr<ChildWindow> mMenuWindow = nullptr;
     std::string m_title;
 };
 }  // namespace Gui
 
-#endif //LEXI_MENU_HPP
+#endif  // LEXI_MENU_HPP

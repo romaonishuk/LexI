@@ -7,12 +7,12 @@
 #include "window.hpp"
 
 /// ---- Button -------
-Button::Button(GlyphParams params, const std::string& text) : IGlyph(params)
+Button::Button(GlyphParams params, const std::string& text): IGlyph(params)
 {
     m_text = text;
 }
 
-void Button::Draw(Gui::Window *w)
+void Button::Draw(Gui::Window* w)
 {
     w->SetForeground(Color::kWhite);
 
@@ -24,25 +24,22 @@ void Button::Draw(Gui::Window *w)
     w->SetForeground(Color::kBlack);
 
     // bottom
-    w->DrawLine({m_params.x, m_params.y + m_params.height},
-                {m_params.x + m_params.width, m_params.y + m_params.height});
+    w->DrawLine(
+        {m_params.x, m_params.y + m_params.height}, {m_params.x + m_params.width, m_params.y + m_params.height});
 
     // right
-    w->DrawLine({m_params.x + m_params.width, m_params.y},
-                {m_params.x + m_params.width, m_params.y + m_params.height});
-
+    w->DrawLine({m_params.x + m_params.width, m_params.y}, {m_params.x + m_params.width, m_params.y + m_params.height});
 
     // TODO(rmn): font should be included
     constexpr auto hMagic = 5;
     constexpr auto wMagic = 10;
 
-    w->DrawText({m_params.x + m_params.width/2 - wMagic, m_params.y + m_params.height/2 + hMagic}, m_text);
+    w->DrawText({m_params.x + m_params.width / 2 - wMagic, m_params.y + m_params.height / 2 + hMagic}, m_text);
 }
 
-void Button::ProcessEvent(Gui::Window *w, const Point& p, const EventType& ev)
+void Button::ProcessEvent(Gui::Window* w, const Point& p, const EventType& ev)
 {
-    switch(ev)
-    {
+    switch(ev) {
         case EventType::ButtonPressed:
             OnButtonPressed(w);
             break;
@@ -55,17 +52,15 @@ void Button::ProcessEvent(Gui::Window *w, const Point& p, const EventType& ev)
     }
 }
 
-
-void Button::OnButtonPressed(Gui::Window *w)
+void Button::OnButtonPressed(Gui::Window* w)
 {
     w->SetForeground(Color::kWhite);
 
     // bottom
-    w->DrawLine({m_params.x, m_params.y + m_params.height},
-                {m_params.x + m_params.width, m_params.y + m_params.height});
+    w->DrawLine(
+        {m_params.x, m_params.y + m_params.height}, {m_params.x + m_params.width, m_params.y + m_params.height});
     // right
-    w->DrawLine({m_params.x + m_params.width, m_params.y},
-                {m_params.x + m_params.width, m_params.y + m_params.height});
+    w->DrawLine({m_params.x + m_params.width, m_params.y}, {m_params.x + m_params.width, m_params.y + m_params.height});
 
     w->SetForeground(Color::kBlack);
 
@@ -77,7 +72,7 @@ void Button::OnButtonPressed(Gui::Window *w)
     w->SetForeground(Color::kGray);
 }
 
-void Button::OnButtonReleased(Gui::Window *w)
+void Button::OnButtonReleased(Gui::Window* w)
 {
     Draw(w);
 }

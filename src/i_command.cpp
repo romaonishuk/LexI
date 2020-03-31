@@ -4,7 +4,6 @@
 
 #include "i_command.hpp"
 
-
 // ------ QuitCommand -----
 ExecutionResult QuitCommand::Execute()
 {

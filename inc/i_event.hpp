@@ -11,9 +11,9 @@ class IEvent
 {
 public:
     virtual ~IEvent() = default;
+
 private:
     EventType mType;
 };
 
-
-#endif //LEXI_I_EVENT_HPP
+#endif  // LEXI_I_EVENT_HPP

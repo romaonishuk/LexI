@@ -9,8 +9,7 @@
 
 #include "types.hpp"
 
-namespace Gui
-{
+namespace Gui {
 class WindowImpl
 {
 public:
@@ -20,7 +19,7 @@ public:
     virtual void DrawRectangle(const Point& point, const width_t width, const height_t height) = 0;
     virtual void DrawText(const Point& text_position, std::string text) = 0;
     virtual void DrawLine(const Point& start_point, const Point& end_point) = 0;
-    virtual void FillRectangle(const Point& point, const width_t width, const height_t height, const Color color)= 0;
+    virtual void FillRectangle(const Point& point, const width_t width, const height_t height, const Color color) = 0;
 
     virtual void SetForeground(const int color) = 0;
 
@@ -32,5 +31,5 @@ public:
     virtual unsigned long GetWindow() const = 0;
     virtual void* GetDisplay() const = 0;
 };
-}
-#endif //LEXI_WINDOW_IMPL_HPP
+}  // namespace Gui
+#endif  // LEXI_WINDOW_IMPL_HPP

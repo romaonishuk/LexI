@@ -8,37 +8,34 @@
 #include "i_glyph.hpp"
 #include "window.hpp"
 
-// TODO(rmn): 
-// - use array + templates to remove 
+// TODO(rmn):
+// - use array + templates to remove
 
-class IDecorator : public ICompositeGlyph
+class IDecorator: public ICompositeGlyph
 {
 public:
-    explicit IDecorator(const GlyphParams& params):
-                ICompositeGlyph(params){}
-    virtual ~IDecorator() = default;
+    explicit IDecorator(const GlyphParams& params): ICompositeGlyph(params) {}
+    ~IDecorator() override = default;
     // virtual void Draw() = 0;
 };
 
-class BorderDecorator : public IDecorator
+class BorderDecorator: public IDecorator
 {
 public:
-    BorderDecorator(const GlyphParams params, Color borderColor): 
-    IDecorator(params), 
-    m_color(borderColor) {}
-    
-    void Draw(Gui::Window* w) override {
-        DrawBorder(w);
-    }
+    BorderDecorator(const GlyphParams params, Color borderColor): IDecorator(params), m_color(borderColor) {}
 
-    void DrawBorder(Gui::Window* w) {
+    void Draw(Gui::Window* w) override { DrawBorder(w); }
+
+    void DrawBorder(Gui::Window* w)
+    {
         for(const auto& it: m_components) {
             it->Draw(w);
         }
-        
+
         w->SetForeground(m_color);
         w->DrawRectangle({m_params.x, m_params.y}, m_params.width, m_params.height);
     }
+
 private:
     Color m_color;
 };
@@ -50,4 +47,4 @@ private:
 //     void Draw() override;
 // };
 
-#endif //LEXI_DECORATOR_HPP
+#endif  // LEXI_DECORATOR_HPP

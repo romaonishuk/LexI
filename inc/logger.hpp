@@ -13,13 +13,14 @@
 class Logger
 {
 public:
-    enum class LogLevel {
+    enum class LogLevel
+    {
         kInfo
     };
 
-    constexpr auto LogLevelToString(const LogLevel lvl) const noexcept {
-        switch (lvl)
-        {
+    constexpr auto LogLevelToString(const LogLevel lvl) const noexcept
+    {
+        switch(lvl) {
             case LogLevel::kInfo:
                 return "INFO";
             default:
@@ -27,19 +28,22 @@ public:
         }
     }
 
-    static Logger &Get() noexcept {
+    static Logger& Get() noexcept
+    {
         static Logger self;
         return self;
     }
 
     template<typename T, typename... Tx>
-    void Log(T current_data, Tx... other) {
+    void Log(T current_data, Tx... other)
+    {
         Log(current_data);
         Log(other...);
     }
 
     template<typename T>
-    void Log(T data) {
+    void Log(T data)
+    {
         std::cout << data;
     }
 
@@ -48,5 +52,4 @@ private:
     ~Logger() = default;
 };
 
-
-#endif //LEXI_LOGGER_HPP
+#endif  // LEXI_LOGGER_HPP

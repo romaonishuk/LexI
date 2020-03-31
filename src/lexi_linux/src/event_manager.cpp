@@ -7,14 +7,13 @@
 #include <algorithm>
 #include "event_manager.hpp"
 
-#include "window.hpp"
 #include "lexi_linux/inc/x_window_impl.hpp"
+#include "window.hpp"
 
 #include <iostream>
 
-EventManager::EventManager(Gui::Window* w): m_mainWindow(w), m_currentWindow(m_mainWindow) {
-
-}
+EventManager::EventManager(Gui::Window* w): m_mainWindow(w), m_currentWindow(m_mainWindow)
+{}
 
 bool EventManager::ChangeCurrentWindow(unsigned long window)
 {
@@ -23,7 +22,7 @@ bool EventManager::ChangeCurrentWindow(unsigned long window)
     }
 
     auto windowsIt = std::find_if(childWindows.begin(), childWindows.end(),
-                          [window](const auto* w){return w->m_window_impl->GetWindow() == window;});
+        [window](const auto* w) { return w->m_window_impl->GetWindow() == window; });
     if(windowsIt == childWindows.end()) {
         std::cout << "Didn't find appropriate window" << std::endl;
         return false;
@@ -38,8 +37,7 @@ void EventManager::RunLoop()
     // TODO(rmn): redesign this
     auto* display = reinterpret_cast<::Display*>(m_mainWindow->m_window_impl->GetDisplay());
 
-    while(!stopLoop)
-    {
+    while(!stopLoop) {
         XEvent event;
         XNextEvent(display, &event);
 
@@ -66,7 +64,7 @@ void EventManager::RunLoop()
             case ClientMessage:
                 // TODO(rmn): learn about client messages!
                 std::cout << "Close received!" << std::endl;
-                return ;
+                return;
             case CreateNotify:
                 break;
             case MotionNotify:
