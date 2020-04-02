@@ -145,4 +145,57 @@ void XWindowImpl::Resize(width_t width, height_t height)
     }
 }
 
+void XWindowImpl::SetFontPath(const std::string& path)
+{
+    char* dir = const_cast<char*>(path.c_str());
+    XSetFontPath(m_display, &dir, 1);
+}
+
+std::optional<FontInfo> XWindowImpl::ChangeFont(const std::string& name)
+{
+//    auto screen = DefaultScreen(m_display);
+    int res_x = 150; // DisplayWidth(m_display, screen) / (DisplayWidthMM(m_display, screen) / 25.4);
+    int res_y = 150; // DisplayHeight(m_display, screen) / (DisplayHeightMM(m_display, screen) / 25.4);
+
+    std::string fontNamePattern =
+        "-*-" + name + "-*-r-*-*-14-*-" + std::to_string(res_x) + "-" + std::to_string(res_y) + "-*-*-*-*";
+
+    auto* font = XLoadQueryFont(m_display, fontNamePattern.c_str());
+    if(font) {
+        XSetFont(m_display, m_gc, font->fid);
+        return FontInfo{name, font->fid};
+    }
+
+    std::cout << "Failed to set font to " << name << std::endl;
+    return std::nullopt;
+}
+
+std::set<FontName> XWindowImpl::GetFontList()
+{
+    int maxNames = 1000;
+    int countReturn = 0;
+    XFontStruct* info_return;
+
+    char** fontsInfoList = XListFontsWithInfo(m_display, "*", maxNames, &countReturn, &info_return);
+    if(!fontsInfoList) {
+        std::cout << "Failed to retrieve XListFontsWithInfo" << std::endl;
+        return {};
+    }
+
+    std::cout << "Received " << countReturn << " fonts" << std::endl;
+
+    std::set<FontName> fontsList;
+
+    for(int i = 0; i < countReturn; ++i) {
+        auto fontName = ParseXLFDName(fontsInfoList[i]);
+        if(!fontName.IsEmpty()) {
+            fontsList.emplace(std::move(fontName));
+        }
+    }
+
+    XFreeFontInfo(fontsInfoList, info_return, countReturn);
+
+    return fontsList;
+}
+
 }  // namespace Gui

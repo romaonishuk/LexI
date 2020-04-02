@@ -6,6 +6,7 @@
 #include "button.hpp"
 #include "decorator.hpp"
 #include "event_manager.hpp"
+#include "font.hpp"
 #include "i_glyph.hpp"
 #include "menu.hpp"
 #include "menu_item.hpp"
@@ -27,6 +28,11 @@ int main()
     Gui::Window window(initial_window_params);
     EventManager eventManager(&window);
     eventManager.addWindow(&window);
+
+    FontManager::Get().Init(&window);
+
+    const auto defaultFont = "Ubuntu Light";
+    FontManager::Get().ChangeFont(defaultFont);
 
     auto top_panel =
         std::make_shared<BorderDecorator>(GlyphParams{0, 0, initial_window_params.width, 50}, Color::kWhite);
@@ -71,6 +77,15 @@ int main()
         bottom_panel->ClearGlyph(&window);
         status_line->ChangeText("Close application", &window);
     });
+
+    for(const auto& it: FontManager::Get().GetFontList()) {
+        auto menuItem = std::make_shared<Gui::MenuItem>(it);
+        fontsMenu->Add(menuItem);
+        menuItem->SetOnFocusedAction([&, it] {
+            bottom_panel->ClearGlyph(&window);
+            status_line->ChangeText(it, &window);
+        });
+    }
 
     eventManager.RunLoop();
 }

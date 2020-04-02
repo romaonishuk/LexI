@@ -6,6 +6,7 @@
 #define LEXI_X_WINDOW_IMPL_CPP_HPP
 
 #include "window_impl.hpp"
+#include "font.hpp"
 
 #include <X11/Xlib.h>
 
@@ -36,6 +37,10 @@ public:
     void ClearGlyph(const GlyphParams& p, bool sendExposureEvent) override;
     void Resize(width_t width, height_t height) override;
 
+    void SetFontPath(const std::string& path) override;
+
+    std::set<FontName> GetFontList() override;
+    std::optional<FontInfo> ChangeFont(const std::string&) override;
 private:
     void CreateWindow(const GlyphParams& params);
     void CreateGraphicContext();

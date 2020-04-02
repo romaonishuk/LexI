@@ -12,8 +12,8 @@ target_include_directories(lexi_interface INTERFACE inc inc/glyphs)
 
 set(PROJECT_SOURCES ${PROJECT_SOURCE_DIR}/src)
 
-FILE(GLOB MY_SOURCES ${PROJECT_SOURCES}/*.cpp)
-add_executable(${PROJECT_NAME} main.cpp ${MY_SOURCES})
+FILE(GLOB LEXI_SOURCES ${PROJECT_SOURCES}/*.cpp)
+add_executable(${PROJECT_NAME} main.cpp ${LEXI_SOURCES})
 target_link_libraries(${PROJECT_NAME} PRIVATE lexi_interface)
 
 # Platform dependent stuff
