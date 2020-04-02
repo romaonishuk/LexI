@@ -80,4 +80,10 @@ void ChildWindow::Draw([[maybe_unused]] Gui::Window* w)
     m_window_impl->SetForeground(kBlack);
     Gui::Window::Draw(this);
 }
+
+void ChildWindow::Resize(width_t width, height_t height)
+{
+    m_window_impl->Resize(width, height);
+}
+
 }  // namespace Gui

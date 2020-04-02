@@ -49,17 +49,20 @@ void EventManager::RunLoop()
                 }
                 break;
             case MapNotify:
+            case UnmapNotify:
                 break;
             case DestroyNotify:
                 std::cout << "Close received!" << std::endl;
                 return;
             case ButtonPress:
-                if(ChangeCurrentWindow(event.xexpose.window)) {
+                if(ChangeCurrentWindow(event.xbutton.window)) {
                     m_currentWindow->ProcessEvent(m_currentWindow, p, EventType::ButtonPressed);
                 }
                 break;
             case ButtonRelease:
-                m_currentWindow->ProcessEvent(m_currentWindow, p, EventType::ButtonReleased);
+                if(m_currentWindow->m_window_impl->GetWindow() == event.xbutton.window) {
+                    m_currentWindow->ProcessEvent(m_currentWindow, p, EventType::ButtonReleased);
+                }
                 break;
             case ClientMessage:
                 // TODO(rmn): learn about client messages!

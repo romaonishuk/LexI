@@ -33,18 +33,18 @@ public:
     void* GetDisplay() const override { return m_display; }
 
     void ClearWindow() override;
+    void ClearGlyph(const GlyphParams& p, bool sendExposureEvent) override;
+    void Resize(width_t width, height_t height) override;
 
 private:
+    void CreateWindow(const GlyphParams& params);
     void CreateGraphicContext();
-
-    void CreateWindow(unsigned int x, unsigned int y, unsigned int width, unsigned int height);
 
     ::Display* m_display;
     ::Window m_window;
     ::GC m_gc;
 
-    // TODO(rmn): WIP change
-    bool m_is_child = false;
+    bool m_isChild = false;
 };
 }  // namespace Gui
 

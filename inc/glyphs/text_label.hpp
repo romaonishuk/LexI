@@ -20,6 +20,12 @@ public:
 
     void Draw(Gui::Window*) override;
     void ProcessEvent(Gui::Window* w, const Point& p, const EventType& ev) override {}
+    void ChangeText(const std::string& text, Gui::Window* w)
+    {
+        m_text = text;
+        //        ClearGlyph(w);
+        Draw(w);
+    }
 
 private:
     std::string m_text;

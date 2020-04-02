@@ -43,6 +43,10 @@ public:
             }
         }
     }
+    void ClearArea(const GlyphParams& p) { m_window_impl->ClearGlyph(p, false); }
+
+    // TODO(rmn): tempo until graphic context investigation
+    WindowImpl* GetImpl() { return m_window_impl.get(); }
 
     void ShowWindow() const;
     void HideWindow() const;
@@ -57,6 +61,7 @@ class ChildWindow: public Window
 public:
     ChildWindow(const GlyphParams&, Window*);
     void Draw(Window*) override;
+    void Resize(width_t width, height_t height);
 
 private:
     // TODO(rmn): weak_ptr

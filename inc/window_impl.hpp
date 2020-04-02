@@ -26,6 +26,8 @@ public:
     virtual void ShowWindow() = 0;
     virtual void HideWindow() = 0;
     virtual void ClearWindow() = 0;
+    virtual void ClearGlyph(const GlyphParams& p, bool sendExposureEvent) = 0;
+    virtual void Resize(width_t width, height_t height) = 0;
 
     // TODO(rmn): Wrap
     virtual unsigned long GetWindow() const = 0;

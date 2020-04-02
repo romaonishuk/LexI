@@ -6,10 +6,17 @@
 #include "i_command.hpp"
 #include "window.hpp"
 
+#include <iostream>
+
 namespace Gui {
 void MenuItem::SetCommand(std::unique_ptr<ICommand> cmd)
 {
     m_command = std::move(cmd);
+}
+
+void MenuItem::SetOnFocusedAction(std::function<void()>&& f)
+{
+    m_onFocused = std::move(f);
 }
 
 void MenuItem::Draw(Window* w)
@@ -68,9 +75,12 @@ void MenuItem::ProcessEvent(Window* w, const Point& p, const EventType& ev)
         case EventType::FocusedIn:
             w->ReDraw();
             w->FillRectangle(m_params, m_params.width, m_params.height, kLightBlue);
-
             w->SetForeground(Color::kBlack);
             w->DrawText({m_params.x + m_params.width / 2 - 10, m_params.y + m_params.height / 2 + 5}, m_text);
+
+            if(m_onFocused) {
+                m_onFocused();
+            }
             break;
         default:
             return;

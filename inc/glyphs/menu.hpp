@@ -20,11 +20,11 @@ public:
 
     void ProcessEvent(Window* w, const Point& p, const EventType& ev) override;
 
-    void Add(GlyphPtr glyph) override;
-
     ChildWindow* getMenuWindow() { return mMenuWindow.get(); }
 
 private:
+    void InitMenuWindow();
+
     std::unique_ptr<ChildWindow> mMenuWindow = nullptr;
     std::string m_title;
 };

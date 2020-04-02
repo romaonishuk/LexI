@@ -13,18 +13,17 @@ XWindowImpl::XWindowImpl(const GlyphParams& params)
         throw std::runtime_error("XWindowImpl display initialisation failed!");
     }
 
-    CreateWindow(params.x, params.y, params.width, params.height);
+    CreateWindow(params);
     CreateGraphicContext();
 
-    Logger::Get().Log("XWindowImpl created!");
+    std::cout << "XWindowImpl created!" << std::endl;
 }
 
-// TODO(rmn): refactor this. Testing menu items
 XWindowImpl::XWindowImpl(const GlyphParams params, XWindowImpl* parentImpl):
     m_display(parentImpl->m_display),
     m_gc(parentImpl->m_gc)
 {
-    m_is_child = true;
+    m_isChild = true;
     m_window = XCreateSimpleWindow(
         m_display, parentImpl->m_window, params.x, params.y, params.width, params.height, 0, 1, 0xC0C0C0);
 
@@ -32,13 +31,11 @@ XWindowImpl::XWindowImpl(const GlyphParams params, XWindowImpl* parentImpl):
     XSelectInput(m_display, m_window,
         ClientMessage | ExposureMask | ButtonPress | ButtonRelease | MotionNotify | FocusIn | FocusOut | Expose |
             GraphicsExpose | CreateNotify | DestroyNotify | SubstructureNotifyMask | PointerMotionMask);
-    //
-    //    XFlush(m_display);
 }
 
 XWindowImpl::~XWindowImpl()
 {
-    if(!m_is_child) {
+    if(!m_isChild) {
         XDestroyWindow(m_display, m_window);
         XFreeGC(m_display, m_gc);
         XCloseDisplay(m_display);
@@ -47,7 +44,7 @@ XWindowImpl::~XWindowImpl()
     }
 }
 
-void XWindowImpl::CreateWindow(unsigned int x, unsigned int y, unsigned int width, unsigned int height)
+void XWindowImpl::CreateWindow(const GlyphParams& params)
 {
     auto screen = DefaultScreen(m_display);
     auto visual = DefaultVisual(m_display, screen);
@@ -56,8 +53,8 @@ void XWindowImpl::CreateWindow(unsigned int x, unsigned int y, unsigned int widt
     attributes.background_pixel = 0xC0C0C0;  // XWhitePixel(m_display, screen);
 
     // TODO(rmn): check errors
-    m_window = XCreateWindow(m_display, XRootWindow(m_display, screen), x, y, width, height, 5, depth, InputOutput,
-        visual, CWBackPixel, &attributes);
+    m_window = XCreateWindow(m_display, XRootWindow(m_display, screen), params.x, params.y, params.width, params.height,
+        5, depth, InputOutput, visual, CWBackPixel, &attributes);
 
     Atom wmDeleteMessage = XInternAtom(m_display, "WM_DELETE_WINDOW", False);
     XSetWMProtocols(m_display, m_window, &wmDeleteMessage, 1);
@@ -65,7 +62,7 @@ void XWindowImpl::CreateWindow(unsigned int x, unsigned int y, unsigned int widt
     // TODO(rmn): this should be moved to event manager
     XSelectInput(m_display, m_window,
         ClientMessage | ExposureMask | ButtonPress | ButtonRelease | MotionNotify | FocusIn | FocusOut | Expose |
-            GraphicsExpose | CreateNotify | DestroyNotify | SubstructureNotifyMask);
+            GraphicsExpose | CreateNotify | DestroyNotify | SubstructureNotifyMask | PointerMotionMask);
 
     /* make the window actually appear on the screen. */
     XMapWindow(m_display, m_window);
@@ -96,7 +93,6 @@ void XWindowImpl::CreateGraphicContext()
 void XWindowImpl::DrawRectangle(const Point& point, const width_t width, const height_t height)
 {
     XDrawRectangle(m_display, m_window, m_gc, point.x, point.y, width, height);
-    // XFlush (m_display);
 }
 
 void XWindowImpl::DrawText(const Point& text_position, std::string text)
@@ -133,6 +129,20 @@ void XWindowImpl::HideWindow()
 void XWindowImpl::ClearWindow()
 {
     XClearWindow(m_display, m_window);
+}
+
+void XWindowImpl::ClearGlyph(const GlyphParams& p, bool sendExposureEvent = false)
+{
+    XClearArea(m_display, m_window, p.x, p.y, p.width, p.height, sendExposureEvent);
+}
+
+void XWindowImpl::Resize(width_t width, height_t height)
+{
+    XWindowAttributes attr;
+    XGetWindowAttributes(m_display, m_window, &attr);
+    if(static_cast<unsigned int>(attr.height) != height || static_cast<unsigned int>(attr.width) != width) {
+        XResizeWindow(m_display, m_window, width, height);
+    }
 }
 
 }  // namespace Gui
