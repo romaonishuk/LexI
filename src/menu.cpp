@@ -26,7 +26,7 @@ void Menu::Draw(Window* w)
 
     w->SetForeground(kBlack);
 
-    w->DrawText({m_params.x + m_params.width, m_params.y + m_params.height}, m_title);
+    w->DrawText(m_params, m_title, Alignment::kCenter);
     w->DrawRectangle({m_params.x, m_params.y}, m_params.width, m_params.height);
 }
 
@@ -34,11 +34,8 @@ void Menu::ProcessEvent(Window* w, const Point& p, const EventType& ev)
 {
     if(ev == EventType::ButtonPressed) {
         mMenuWindow->ShowWindow();
-        std::cout << "Button pressed" << std::endl;
     } else if(ev == EventType::ButtonReleased) {
-        std::cout << "Button ButtonReleased" << std::endl;
         mMenuWindow->HideWindow();
-        std::cout << "Button ButtonReleased" << std::endl;
     }
 }
 
@@ -50,13 +47,13 @@ void Menu::InitMenuWindow()
     width_t width = defaultWidth;
 
     unsigned int index = 0;
-    for(auto &it: m_components) {
-        it->SetGlyphParams({0, index*defaultHeight, defaultWidth, defaultHeight});
+    for(auto& it: m_components) {
+        it->SetGlyphParams({0, index * defaultHeight, defaultWidth, defaultHeight});
         mMenuWindow->Add(it);
         index++;
     }
 
-    mMenuWindow->Resize(width, index*defaultHeight);
+    mMenuWindow->Resize(width, index * defaultHeight);
     m_components.clear();
 }
 

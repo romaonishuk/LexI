@@ -19,6 +19,11 @@ void MenuItem::SetOnFocusedAction(std::function<void()>&& f)
     m_onFocused = std::move(f);
 }
 
+void MenuItem::SetOnButtonPressedAction(std::function<void()>&& f)
+{
+    m_onButtonPressed = std::move(f);
+}
+
 void MenuItem::Draw(Window* w)
 {
     w->SetForeground(Color::kWhite);
@@ -37,11 +42,7 @@ void MenuItem::Draw(Window* w)
     // right
     w->DrawLine({m_params.x + m_params.width, m_params.y}, {m_params.x + m_params.width, m_params.y + m_params.height});
 
-    // TODO(rmn): font should be included
-    constexpr auto hMagic = 5;
-    constexpr auto wMagic = 10;
-
-    w->DrawText({m_params.x + m_params.width / 2 - wMagic, m_params.y + m_params.height / 2 + hMagic}, m_text);
+    w->DrawText(m_params, m_text, Alignment::kLeft);
 }
 
 void MenuItem::ProcessEvent(Window* w, const Point& p, const EventType& ev)
@@ -65,6 +66,11 @@ void MenuItem::ProcessEvent(Window* w, const Point& p, const EventType& ev)
             w->DrawLine({m_params.x, m_params.y}, {m_params.x, m_params.y + m_params.height});
 
             w->SetForeground(Color::kGray);
+
+            if(m_onButtonPressed) {
+                m_onButtonPressed();
+            }
+
             break;
         case EventType::ButtonReleased:
             Draw(w);
@@ -73,10 +79,9 @@ void MenuItem::ProcessEvent(Window* w, const Point& p, const EventType& ev)
             }
             break;
         case EventType::FocusedIn:
-            w->ReDraw();
             w->FillRectangle(m_params, m_params.width, m_params.height, kLightBlue);
             w->SetForeground(Color::kBlack);
-            w->DrawText({m_params.x + m_params.width / 2 - 10, m_params.y + m_params.height / 2 + 5}, m_text);
+            w->DrawText(m_params, m_text, Alignment::kLeft);
 
             if(m_onFocused) {
                 m_onFocused();

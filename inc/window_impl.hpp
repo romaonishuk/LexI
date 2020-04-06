@@ -5,13 +5,15 @@
 #ifndef LEXI_WINDOW_IMPL_HPP
 #define LEXI_WINDOW_IMPL_HPP
 
-#include <string>
 #include <set>
+#include <string>
 
 #include "types.hpp"
 
+namespace Lexi {
+struct Font;
 struct FontName;
-struct FontInfo;
+}
 
 namespace Gui {
 class WindowImpl
@@ -33,13 +35,15 @@ public:
     virtual void ClearGlyph(const GlyphParams& p, bool sendExposureEvent) = 0;
     virtual void Resize(width_t width, height_t height) = 0;
 
-    virtual std::set<FontName> GetFontList() = 0;
-    virtual std::optional<FontInfo> ChangeFont(const std::string&) = 0;
+    virtual std::set<Lexi::FontName> GetFontList() = 0;
+    virtual bool ChangeFont(Lexi::Font&) = 0;
     virtual void SetFontPath(const std::string& path) = 0;
 
     // TODO(rmn): Wrap
     virtual unsigned long GetWindow() const = 0;
     virtual void* GetDisplay() const = 0;
+
+    virtual void DrawText(const GlyphParams& params, const std::string& text, Alignment alignment) = 0;
 };
 }  // namespace Gui
 #endif  // LEXI_WINDOW_IMPL_HPP

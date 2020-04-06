@@ -24,7 +24,7 @@ public:
     {
         m_text = text;
         //        ClearGlyph(w);
-        Draw(w);
+//        Draw(w);
     }
 
 private:

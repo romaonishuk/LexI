@@ -3,7 +3,7 @@
 //
 
 #include <omp.h>
-#include <stdint.h>
+#include <cstdint>
 
 #ifndef LEXI_TYPES_HPP
 #define LEXI_TYPES_HPP
@@ -26,6 +26,13 @@ enum class EventType
     ButtonPressed,
     ButtonReleased,
     FocusedIn
+};
+
+enum class Alignment
+{
+    kLeft,
+    kCenter,
+    kRight
 };
 
 struct Point

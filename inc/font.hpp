@@ -16,6 +16,7 @@ namespace {
 const auto path = "/home/ronyshchuk/Desktop/LexI/resources/fonts";
 }
 
+namespace Lexi {
 struct FontName
 {
     FontName(const std::string& name, const std::string& additionalName):
@@ -38,52 +39,55 @@ struct FontName
     std::string m_addStyleName;
 };
 
-struct FontInfo
+struct Font
 {
-    FontInfo() = default;
-    FontInfo(const std::string& name, unsigned long fid): m_name(name), m_fontId(fid) {}
+    enum class Weight
+    {
+        kMedium,
+        kBold
+    };
+
+    enum class Slant
+    {
+        kNormal,
+        kItalic
+    };
+
+    Font() = default;
+    Font(const std::string& name, unsigned long fid): m_name(name), m_fontId(fid) {}
 
     std::string m_name;
     unsigned long m_fontId = 0;
 
-    uint32_t font_size = 12;
+    uint32_t m_fontSize = 14;
+    Weight m_weight = Weight::kMedium;
+    Slant m_slant = Slant::kNormal;
 };
 
 class FontManager
 {
 public:
-    static FontManager& Get()
-    {
-        static FontManager manager;
-        return manager;
-    }
+    static FontManager& Get();
 
-    void Init(Gui::Window* w)
-    {
-        impl = w->GetImpl();
-        impl->SetFontPath(path);
+    void Init(Gui::Window* w);
 
-        m_existingFonts = impl->GetFontList();
-        std::cout << "Successfully loaded " << m_existingFonts.size() << " fonts!" << std::endl;
-    }
+    bool SetFont(const std::string& fontName);
+    bool SetFont(Font& font);
+    void SetFontWeight(const Font::Weight& w);
+    void SetFontSlant(const Font::Slant& s);
+    void SetFontSize(const std::string& fontSize);
+    unsigned long GetFontId() { return m_currentFont.m_fontId; };
 
-    void ChangeFont(const std::string& fontName) {
-        auto font = impl->ChangeFont(fontName);
-        if(font) {
-            std::cout << "Font changed from " << m_currentFont.m_name << " to " << font->m_name << std::endl;
-            m_currentFont = *font;
-        }
-    }
-
-    std::vector<std::string> GetFontList() { return {m_existingFonts.begin(), m_existingFonts.end()}; }
+    std::vector<std::string> GetFontList();
 
 private:
     FontManager() = default;
     ~FontManager() = default;
 
     Gui::WindowImpl* impl = nullptr;
-    FontInfo m_currentFont;
+    Font m_currentFont;
     std::set<FontName> m_existingFonts;
 };
+}  // namespace Lexi
 
 #endif  // LEXI_FONT_HPP

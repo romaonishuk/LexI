@@ -7,8 +7,9 @@
 
 #include <string>
 
+namespace Lexi {
 struct FontName;
 
 FontName ParseXLFDName(const std::string& name);
-
+}  // namespace Lexi
 #endif  // LEXI_COMMON_HPP

@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 
+namespace Lexi {
 FontName ParseXLFDName(const std::string& name)
 {
     // 14 registers + first empty
@@ -34,7 +35,7 @@ FontName ParseXLFDName(const std::string& name)
     std::string registerField;
 
     std::istringstream tokenStream(name);
-    while (std::getline(tokenStream, registerField, '-')) {
+    while(std::getline(tokenStream, registerField, '-')) {
         xlfdRegisters.push_back(registerField);
     }
 
@@ -45,3 +46,4 @@ FontName ParseXLFDName(const std::string& name)
 
     return FontName{xlfdRegisters[FAMILY_NAME], xlfdRegisters[ADD_STYLE_NAME]};
 }
+}  // namespace Lexi

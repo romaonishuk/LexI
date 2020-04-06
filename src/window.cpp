@@ -51,6 +51,11 @@ void Window::DrawText(const Point& text_position, std::string text) const
     m_window_impl->DrawText(text_position, text);
 }
 
+void Window::DrawText(const GlyphParams& params, const std::string& text, Alignment alignment)
+{
+    m_window_impl->DrawText(params, text, alignment);
+}
+
 void Window::DrawLine(const Point& start_point, const Point& end_point) const
 {
     m_window_impl->DrawLine(start_point, end_point);
@@ -84,6 +89,24 @@ void ChildWindow::Draw([[maybe_unused]] Gui::Window* w)
 void ChildWindow::Resize(width_t width, height_t height)
 {
     m_window_impl->Resize(width, height);
+}
+
+void ChildWindow::ProcessEvent(Gui::Window* w, const Point& p, const EventType& ev)
+{
+    for(const auto& it: m_components) {
+        if(it->Intersects(p)) {
+            // Menu item hasn't changed
+            if(ev == EventType::FocusedIn && m_currentMenuItem) {
+                if(it == m_currentMenuItem) {
+                    return;
+                }
+
+                m_currentMenuItem->ReDraw(this);
+            }
+            SetCurrentMenuItem(it);
+            return it->ProcessEvent(w, p, ev);
+        }
+    }
 }
 
 }  // namespace Gui

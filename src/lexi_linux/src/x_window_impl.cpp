@@ -4,6 +4,7 @@
 
 #include "x_window_impl.hpp"
 #include "logger.hpp"
+#include "font.hpp"
 
 namespace Gui {
 XWindowImpl::XWindowImpl(const GlyphParams& params)
@@ -54,7 +55,7 @@ void XWindowImpl::CreateWindow(const GlyphParams& params)
 
     // TODO(rmn): check errors
     m_window = XCreateWindow(m_display, XRootWindow(m_display, screen), params.x, params.y, params.width, params.height,
-        5, depth, InputOutput, visual, CWBackPixel, &attributes);
+        0, depth, InputOutput, visual, CWBackPixel, &attributes);
 
     Atom wmDeleteMessage = XInternAtom(m_display, "WM_DELETE_WINDOW", False);
     XSetWMProtocols(m_display, m_window, &wmDeleteMessage, 1);
@@ -73,10 +74,10 @@ void XWindowImpl::CreateWindow(const GlyphParams& params)
 
 void XWindowImpl::CreateGraphicContext()
 {
-    unsigned int line_width = 2; /* line width for the GC.       */
+    unsigned int line_width = 1; /* line width for the GC.       */
     int line_style = LineSolid;  /* style for lines drawing and  */
-    int cap_style = CapButt;     /* style of the line's edje and */
-    int join_style = JoinBevel;  /*  joined lines.		*/
+    int cap_style = CapRound;    /* style of the line's edje and */
+    int join_style = JoinRound;  /*  joined lines.		*/
 
     m_gc = XCreateGC(m_display, m_window, 0, nullptr);
     if(m_gc == nullptr) {
@@ -112,7 +113,7 @@ void XWindowImpl::SetForeground(const int color)
 
 void XWindowImpl::FillRectangle(const Point& point, const width_t width, const height_t height, const Color color)
 {
-    SetForeground(color);
+    SetForeground(color);  //  TODO(rmn): this should be fixed
     XFillRectangle(m_display, m_window, m_gc, point.x, point.y, width, height);
 }
 
@@ -147,30 +148,61 @@ void XWindowImpl::Resize(width_t width, height_t height)
 
 void XWindowImpl::SetFontPath(const std::string& path)
 {
-    char* dir = const_cast<char*>(path.c_str());
-    XSetFontPath(m_display, &dir, 1);
+    int fontsCount = 0;
+    char** currentPath = XGetFontPath(m_display, &fontsCount);
+
+    std::vector<char*> v;
+    v.reserve(fontsCount + 1);
+    for(int i = 0; i < fontsCount; ++i) {
+        v.push_back(currentPath[i]);
+    }
+    v.push_back(const_cast<char*>(path.c_str()));
+
+    XSetFontPath(m_display, v.data(), v.size());
+    XFreeFontPath(currentPath);
 }
 
-std::optional<FontInfo> XWindowImpl::ChangeFont(const std::string& name)
+bool XWindowImpl::ChangeFont(Lexi::Font& font)
 {
-//    auto screen = DefaultScreen(m_display);
-    int res_x = 150; // DisplayWidth(m_display, screen) / (DisplayWidthMM(m_display, screen) / 25.4);
-    int res_y = 150; // DisplayHeight(m_display, screen) / (DisplayHeightMM(m_display, screen) / 25.4);
+    auto screen = DefaultScreen(m_display);
+    int res_x = DisplayWidth(m_display, screen) / (DisplayWidthMM(m_display, screen) / 25.4);
+    int res_y = DisplayHeight(m_display, screen) / (DisplayHeightMM(m_display, screen) / 25.4);
 
-    std::string fontNamePattern =
-        "-*-" + name + "-*-r-*-*-14-*-" + std::to_string(res_x) + "-" + std::to_string(res_y) + "-*-*-*-*";
+    auto getWight = [&] {
+        if(font.m_weight == Lexi::Font::Weight::kBold) {
+            return "-bold";
+        }
+        return "-medium";
+    };
 
-    auto* font = XLoadQueryFont(m_display, fontNamePattern.c_str());
-    if(font) {
-        XSetFont(m_display, m_gc, font->fid);
-        return FontInfo{name, font->fid};
+    auto getSlant = [&] {
+        if(font.m_slant == Lexi::Font::Slant::kItalic) {
+            return "-i";
+        }
+        return "-r";
+    };
+
+    std::string fontNamePattern = "-*-";
+    fontNamePattern += font.m_name;
+    fontNamePattern += getWight();
+    fontNamePattern += getSlant();
+    fontNamePattern += "-*-*-";
+    fontNamePattern +=
+        std::to_string(font.m_fontSize) + "-*-" + std::to_string(res_x) + "-" + std::to_string(res_y) + "-*-*-*-*";
+
+    auto* result = XLoadQueryFont(m_display, fontNamePattern.c_str());
+    if(result) {
+        XSetFont(m_display, m_gc, result->fid);
+        font.m_fontId = result->fid;
+        //        XFreeFont(m_display, fontInfo);
+        return true;
     }
 
-    std::cout << "Failed to set font to " << name << std::endl;
-    return std::nullopt;
+    std::cout << "Failed to set font to " << font.m_name << std::endl;
+    return false;
 }
 
-std::set<FontName> XWindowImpl::GetFontList()
+std::set<Lexi::FontName> XWindowImpl::GetFontList()
 {
     int maxNames = 1000;
     int countReturn = 0;
@@ -184,10 +216,10 @@ std::set<FontName> XWindowImpl::GetFontList()
 
     std::cout << "Received " << countReturn << " fonts" << std::endl;
 
-    std::set<FontName> fontsList;
+    std::set<Lexi::FontName> fontsList;
 
     for(int i = 0; i < countReturn; ++i) {
-        auto fontName = ParseXLFDName(fontsInfoList[i]);
+        auto fontName = Lexi::ParseXLFDName(fontsInfoList[i]);
         if(!fontName.IsEmpty()) {
             fontsList.emplace(std::move(fontName));
         }
@@ -196,6 +228,41 @@ std::set<FontName> XWindowImpl::GetFontList()
     XFreeFontInfo(fontsInfoList, info_return, countReturn);
 
     return fontsList;
+}
+
+void XWindowImpl::DrawText(const GlyphParams& params, const std::string& text, Alignment alignment)
+{
+    auto* fontInfo = XQueryFont(m_display, Lexi::FontManager::Get().GetFontId());
+    if(!fontInfo) {
+        std::cout << "Failed to load font information" << std::endl;
+        return;
+    }
+
+    int direction_return = 0;
+    int font_ascent_return = 0, font_descent_return = 0;
+    XCharStruct overall_return;
+
+    XTextExtents(fontInfo, text.c_str(), text.size(), &direction_return, &font_ascent_return, &font_descent_return,
+        &overall_return);
+
+    Point point;
+    // TODO(rmn): errors + too long/big words + other cases where descent !=0 + include bearing
+    switch(alignment) {
+        case Alignment::kCenter:
+            point.x = params.x + params.width / 2 - overall_return.width / 2;
+            point.y = params.y + params.height / 2 + overall_return.ascent / 2;
+            break;
+        case Alignment::kRight:
+            point.x = params.x + params.width - overall_return.width;
+            point.y = params.y + params.height / 2 + overall_return.ascent / 2;
+            break;
+        case Alignment::kLeft:
+            point.x = params.x;
+            point.y = params.y + params.height / 2 + overall_return.ascent / 2;
+            break;
+    }
+
+    DrawText(point, text);
 }
 
 }  // namespace Gui

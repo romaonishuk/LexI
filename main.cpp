@@ -29,10 +29,10 @@ int main()
     EventManager eventManager(&window);
     eventManager.addWindow(&window);
 
-    FontManager::Get().Init(&window);
+    Lexi::FontManager::Get().Init(&window);
 
-    const auto defaultFont = "Ubuntu Light";
-    FontManager::Get().ChangeFont(defaultFont);
+    const auto defaultFont = "Ubuntu";
+    Lexi::FontManager::Get().SetFont(defaultFont);
 
     auto top_panel =
         std::make_shared<BorderDecorator>(GlyphParams{0, 0, initial_window_params.width, 50}, Color::kWhite);
@@ -61,8 +61,8 @@ int main()
     window.Add(scroll_board);
 
     auto bottom_panel =
-        std::make_shared<BorderDecorator>(GlyphParams{0, 1000, initial_window_params.width, 20}, Color::kBlack);
-    auto status_line = std::make_shared<TextLabel>(GlyphParams{10, 1015, 100, 20}, Version);
+        std::make_shared<BorderDecorator>(GlyphParams{0, 925, initial_window_params.width, 20}, Color::kBlack);
+    auto status_line = std::make_shared<TextLabel>(GlyphParams{10, 940, 100, 20}, Version);
     bottom_panel->Add(status_line);
     window.Add(bottom_panel);
 
@@ -70,20 +70,23 @@ int main()
     openMenuItem->SetOnFocusedAction([&] {
         bottom_panel->ClearGlyph(&window);
         status_line->ChangeText("Open file", &window);
+        bottom_panel->Draw(&window);
     });
 
     quitMenuItem->SetCommand(std::make_unique<QuitCommand>(&eventManager));
     quitMenuItem->SetOnFocusedAction([&] {
         bottom_panel->ClearGlyph(&window);
         status_line->ChangeText("Close application", &window);
+        bottom_panel->Draw(&window);
     });
 
-    for(const auto& it: FontManager::Get().GetFontList()) {
+    for(const auto& it: Lexi::FontManager::Get().GetFontList()) {
         auto menuItem = std::make_shared<Gui::MenuItem>(it);
         fontsMenu->Add(menuItem);
         menuItem->SetOnFocusedAction([&, it] {
             bottom_panel->ClearGlyph(&window);
             status_line->ChangeText(it, &window);
+            bottom_panel->Draw(&window);
         });
     }
 

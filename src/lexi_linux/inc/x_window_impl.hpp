@@ -20,6 +20,7 @@ public:
 
     void DrawRectangle(const Point& point, const width_t width, const height_t height) override;
     void DrawText(const Point& text_position, std::string text) override;
+    void DrawText(const GlyphParams& params, const std::string& text, Alignment alignment) override;
     void DrawLine(const Point& start_point, const Point& end_point) override;
 
     void SetForeground(const int color) override;
@@ -39,8 +40,8 @@ public:
 
     void SetFontPath(const std::string& path) override;
 
-    std::set<FontName> GetFontList() override;
-    std::optional<FontInfo> ChangeFont(const std::string&) override;
+    std::set<Lexi::FontName> GetFontList() override;
+    bool ChangeFont(Lexi::Font&) override;
 private:
     void CreateWindow(const GlyphParams& params);
     void CreateGraphicContext();

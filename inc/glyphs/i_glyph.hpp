@@ -22,6 +22,10 @@ public:
 
     using GlyphPtr = std::shared_ptr<IGlyph>;
     virtual void Draw(Gui::Window*) = 0;  // TODO: const?
+    virtual void ReDraw(Gui::Window* w) {
+        ClearGlyph(w);
+        Draw(w);
+    }
     virtual void Insert(GlyphPtr, size_t) {}
 
 
