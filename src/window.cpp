@@ -91,12 +91,12 @@ void ChildWindow::Resize(width_t width, height_t height)
     m_window_impl->Resize(width, height);
 }
 
-void ChildWindow::ProcessEvent(Gui::Window* w, const Point& p, const EventType& ev)
+void ChildWindow::ProcessEvent(Gui::Window* w, const Event& event)
 {
     for(const auto& it: m_components) {
-        if(it->Intersects(p)) {
+        if(it->Intersects(event.GetPoint())) {
             // Menu item hasn't changed
-            if(ev == EventType::FocusedIn && m_currentMenuItem) {
+            if(event.GetEvent() == EventType::FocusedIn && m_currentMenuItem) {
                 if(it == m_currentMenuItem) {
                     return;
                 }
@@ -104,7 +104,7 @@ void ChildWindow::ProcessEvent(Gui::Window* w, const Point& p, const EventType& 
                 m_currentMenuItem->ReDraw(this);
             }
             SetCurrentMenuItem(it);
-            return it->ProcessEvent(w, p, ev);
+            return it->ProcessEvent(w, event);
         }
     }
 }

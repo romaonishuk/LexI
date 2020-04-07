@@ -2,7 +2,9 @@
 // Created by romaonishuk on 24.02.20.
 //
 
+#include <X11/XKBlib.h>
 #include <X11/Xlib.h>
+#include <X11/keysym.h>
 
 #include <algorithm>
 #include "event_manager.hpp"
@@ -36,7 +38,6 @@ void EventManager::RunLoop()
 {
     // TODO(rmn): redesign this
     auto* display = reinterpret_cast<::Display*>(m_mainWindow->m_window_impl->GetDisplay());
-
     while(!stopLoop) {
         XEvent event;
         XNextEvent(display, &event);
@@ -56,12 +57,12 @@ void EventManager::RunLoop()
                 return;
             case ButtonPress:
                 if(ChangeCurrentWindow(event.xbutton.window)) {
-                    m_currentWindow->ProcessEvent(m_currentWindow, p, EventType::ButtonPressed);
+                    m_currentWindow->ProcessEvent(m_currentWindow, {p, EventType::ButtonPressed});
                 }
                 break;
             case ButtonRelease:
                 if(m_currentWindow->m_window_impl->GetWindow() == event.xbutton.window) {
-                    m_currentWindow->ProcessEvent(m_currentWindow, p, EventType::ButtonReleased);
+                    m_currentWindow->ProcessEvent(m_currentWindow, {p, EventType::ButtonReleased});
                 }
                 break;
             case ClientMessage:
@@ -71,8 +72,16 @@ void EventManager::RunLoop()
             case CreateNotify:
                 break;
             case MotionNotify:
-                std::cout << "Motion: x" << event.xmotion.x << " y: " << event.xmotion.y << std::endl;
-                m_currentWindow->ProcessEvent(m_currentWindow, p, EventType::FocusedIn);
+                m_currentWindow->ProcessEvent(m_currentWindow, {p, EventType::FocusedIn});
+                break;
+            case FocusIn:
+                std::cout << "Focus in" << std::endl;
+                break;
+            case FocusOut:
+                std::cout << "Focus out" << std::endl;
+                break;
+            case EnterNotify:
+            case LeaveNotify:
                 break;
             default:
                 std::cout << "RMN unprocessed event:" << event.type << std::endl;

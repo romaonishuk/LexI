@@ -35,12 +35,13 @@ public:
         }
     }
 
-    void ProcessEvent(Gui::Window* w, const Point& p, const EventType& ev) override
+    void ProcessEvent(Gui::Window* w, const Event& event) override
     {
-        if(Intersects(p)) {
+        const auto& point = event.GetPoint();
+        if(Intersects(point)) {
             for(const auto& it: m_components) {
-                if(it->Intersects(p)) {
-                    return it->ProcessEvent(w, p, ev);
+                if(it->Intersects(point)) {
+                    return it->ProcessEvent(w, event);
                 }
             }
         }

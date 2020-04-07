@@ -17,17 +17,24 @@ public:
     explicit Menu(const GlyphParams& p, const std::string& title, Window* w);
 
     void Draw(Window* w) override;
-
-    void ProcessEvent(Window* w, const Point& p, const EventType& ev) override;
+    void ProcessEvent(Gui::Window* w, const Event& event) override;
 
     ChildWindow* getMenuWindow() { return mMenuWindow.get(); }
 
-private:
+protected:
     void InitMenuWindow();
-
+// TODO(rmn) private:
     std::unique_ptr<ChildWindow> mMenuWindow = nullptr;
     std::string m_title;
 };
+
+class DropDownMenu: public Menu
+{
+public:
+    DropDownMenu(const GlyphParams& p, const std::string& title, Window* w): Menu(p, title, w){}
+    void Draw(Window* w) override;
+};
+
 }  // namespace Gui
 
 #endif  // LEXI_MENU_HPP

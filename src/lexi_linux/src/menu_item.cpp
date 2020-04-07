@@ -45,9 +45,9 @@ void MenuItem::Draw(Window* w)
     w->DrawText(m_params, m_text, Alignment::kLeft);
 }
 
-void MenuItem::ProcessEvent(Window* w, const Point& p, const EventType& ev)
+void MenuItem::ProcessEvent(Gui::Window* w, const Event& event)
 {
-    switch(ev) {
+    switch(event.GetEvent()) {
         case EventType::ButtonPressed:
             w->SetForeground(Color::kWhite);
 

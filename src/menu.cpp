@@ -30,8 +30,9 @@ void Menu::Draw(Window* w)
     w->DrawRectangle({m_params.x, m_params.y}, m_params.width, m_params.height);
 }
 
-void Menu::ProcessEvent(Window* w, const Point& p, const EventType& ev)
+void Menu::ProcessEvent(Gui::Window* w, const Event& event)
 {
+    const auto& ev = event.GetEvent();
     if(ev == EventType::ButtonPressed) {
         mMenuWindow->ShowWindow();
     } else if(ev == EventType::ButtonReleased) {
@@ -57,4 +58,19 @@ void Menu::InitMenuWindow()
     m_components.clear();
 }
 
+// --- DropDownMenu ---
+
+void DropDownMenu::Draw(Window* w)
+{
+    // TODO(rmn): weird logic
+    if(!m_components.empty()) {
+        InitMenuWindow();
+    }
+
+    w->DrawRectangle({m_params.x, m_params.y}, m_params.width, m_params.height);
+    w->FillRectangle({m_params.x, m_params.y}, m_params.width, m_params.height, Color::kWhite);
+
+    w->SetForeground(Color::kBlack);
+    w->DrawText(m_params, m_title, Alignment::kLeft);
+}
 }  // namespace Gui

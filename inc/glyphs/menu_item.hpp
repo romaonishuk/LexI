@@ -17,10 +17,11 @@ public:
     explicit MenuItem(const std::string& text): IGlyph(GlyphParams{}), m_text(text) {}
 
     void Draw(Window* w) override;
-    void ProcessEvent(Window* w, const Point& p, const EventType& ev) override;
+    void ProcessEvent(Gui::Window* w, const Event& event) override;
 
     void SetCommand(std::unique_ptr<ICommand>);
     void SetOnFocusedAction(std::function<void()>&&);
+    void SetOnButtonPressedAction(std::function<void()>&&);
 
     const std::string& GetText() const { return m_text; }
 
@@ -29,6 +30,7 @@ private:
     std::string m_text;
 
     std::function<void()> m_onFocused;
+    std::function<void()> m_onButtonPressed;
 };
 }  // namespace Gui
 #endif  // LEXI_MENU_ITEM_HPP

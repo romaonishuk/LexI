@@ -19,7 +19,7 @@ public:
     {}
 
     void Draw(Gui::Window*) override;
-    void ProcessEvent(Gui::Window* w, const Point& p, const EventType& ev) override {}
+    void ProcessEvent(Gui::Window* w, const Event& event) override {}
     void ChangeText(const std::string& text, Gui::Window* w)
     {
         m_text = text;

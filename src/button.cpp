@@ -30,16 +30,12 @@ void Button::Draw(Gui::Window* w)
     // right
     w->DrawLine({m_params.x + m_params.width, m_params.y}, {m_params.x + m_params.width, m_params.y + m_params.height});
 
-    // TODO(rmn): font should be included
-    constexpr auto hMagic = 5;
-    constexpr auto wMagic = 10;
-
-    w->DrawText({m_params.x + m_params.width / 2 - wMagic, m_params.y + m_params.height / 2 + hMagic}, m_text);
+    w->DrawText(m_params, m_text, Alignment::kCenter);
 }
 
-void Button::ProcessEvent(Gui::Window* w, const Point& p, const EventType& ev)
+void Button::ProcessEvent(Gui::Window* w, const Event& event)
 {
-    switch(ev) {
+    switch(event.GetEvent()) {
         case EventType::ButtonPressed:
             OnButtonPressed(w);
             break;

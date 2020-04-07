@@ -18,7 +18,7 @@ public:
     void OnButtonPressed(Gui::Window*);
     void OnButtonReleased(Gui::Window*);
 
-    void ProcessEvent(Gui::Window* w, const Point& p, const EventType& ev) override;
+    void ProcessEvent(Gui::Window* w, const Event& event) override;
 
 public:
     std::string m_text;

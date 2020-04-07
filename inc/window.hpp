@@ -36,11 +36,11 @@ public:
 
     void SetForeground(int color) const;
 
-    void ProcessEvent(Gui::Window* w, const Point& p, const EventType& ev) override
+    void ProcessEvent(Gui::Window* w, const Event& event) override
     {
         for(const auto& it: m_components) {
-            if(it->Intersects(p)) {
-                return it->ProcessEvent(w, p, ev);
+            if(it->Intersects(event.GetPoint())) {
+                return it->ProcessEvent(w, event);
             }
         }
     }
@@ -63,7 +63,7 @@ class ChildWindow: public Window
 public:
     ChildWindow(const GlyphParams&, Window*);
     void Draw(Window*) override;
-    void ProcessEvent(Gui::Window* w, const Point& p, const EventType& ev) override;
+    void ProcessEvent(Gui::Window* w, const Event& event) override;
     void Resize(width_t width, height_t height);
 
     void SetCurrentMenuItem(GlyphPtr item) {

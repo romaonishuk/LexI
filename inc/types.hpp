@@ -20,14 +20,6 @@ enum Color
     kLightBlue = 0xD6EBFF
 };
 
-enum class EventType
-{
-    KeyPressed,
-    ButtonPressed,
-    ButtonReleased,
-    FocusedIn
-};
-
 enum class Alignment
 {
     kLeft,

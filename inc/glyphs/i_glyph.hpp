@@ -8,10 +8,14 @@
 #include <memory>
 
 #include "types.hpp"
+#include "events.hpp"
 
 namespace Gui {
 class Window;
 }
+
+using Lexi::EventType;
+using Lexi::Event;
 
 class IGlyph
 {
@@ -31,7 +35,7 @@ public:
 
     bool Intersects(const Point& p) { return m_params.IsIntersects(p); }
 
-    virtual void ProcessEvent(Gui::Window* w, const Point& p, const EventType& ev) = 0;
+    virtual void ProcessEvent(Gui::Window* w, const Event& event) = 0;
 
     virtual void Add(GlyphPtr glyph) {}
 

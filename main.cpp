@@ -16,6 +16,10 @@
 
 const auto Version = "Lexi v1.0";
 
+#include <array>
+const std::array supportedFontSizes = {
+    "10", "10,5", "11", "12", "14", "16", "18", "20", "22", "32", "48", "54", "72", "96"};
+
 int main()
 {
     // Create window
@@ -53,6 +57,10 @@ int main()
     top_panel->Add(fontsMenu);
     eventManager.addWindow(fontsMenu->getMenuWindow());
 
+    auto fontSizeMenu = std::make_shared<Gui::DropDownMenu>(GlyphParams{365, 10, 80, 20}, "12", &window);
+    top_panel->Add(fontSizeMenu);
+    eventManager.addWindow(fontSizeMenu->getMenuWindow());
+
     auto text_view_border = std::make_shared<BorderDecorator>(GlyphParams{40, 100, 700, 800}, Color::kBlack);
     text_view_border->Add(std::make_shared<TextView>(GlyphParams{40, 100, 700, 800}));
     window.Add(text_view_border);
@@ -88,6 +96,12 @@ int main()
             status_line->ChangeText(it, &window);
             bottom_panel->Draw(&window);
         });
+    }
+
+    for(const auto& it: supportedFontSizes) {
+        auto item = std::make_shared<Gui::MenuItem>(it);
+        item->SetOnButtonPressedAction([it] { Lexi::FontManager::Get().SetFontSize(it); });
+        fontSizeMenu->Add(std::move(item));
     }
 
     eventManager.RunLoop();
