@@ -5,8 +5,6 @@
 #include "menu.hpp"
 #include "i_command.hpp"
 
-#include <iostream>
-
 // TODO(rmn): remove copy-paste
 
 // TODO(rmn): Menu improvement: it width and heigth should be calculated relatively to MenuItems

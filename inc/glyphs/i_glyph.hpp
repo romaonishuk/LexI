@@ -7,15 +7,18 @@
 
 #include <memory>
 
-#include "types.hpp"
+// TODO(rmn): remove after logger finished
+#include <iostream>
+
 #include "events.hpp"
+#include "types.hpp"
 
 namespace Gui {
 class Window;
 }
 
-using Lexi::EventType;
 using Lexi::Event;
+using Lexi::EventType;
 
 class IGlyph
 {
@@ -26,12 +29,12 @@ public:
 
     using GlyphPtr = std::shared_ptr<IGlyph>;
     virtual void Draw(Gui::Window*) = 0;  // TODO: const?
-    virtual void ReDraw(Gui::Window* w) {
+    virtual void ReDraw(Gui::Window* w)
+    {
         ClearGlyph(w);
         Draw(w);
     }
     virtual void Insert(GlyphPtr, size_t) {}
-
 
     bool Intersects(const Point& p) { return m_params.IsIntersects(p); }
 
@@ -41,6 +44,11 @@ public:
 
     void ClearGlyph(Gui::Window* w);
 
+    void SetPosition(const Point& p)
+    {
+        m_params.x = p.x;
+        m_params.y = p.y;
+    }
     void SetGlyphParams(const GlyphParams& params) { m_params = params; }
     width_t GetWidth() const { return m_params.width; }
     height_t GetHeight() const { return m_params.height; }

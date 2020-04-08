@@ -4,6 +4,7 @@
 
 #include <omp.h>
 #include <cstdint>
+#include <ostream>
 
 #ifndef LEXI_TYPES_HPP
 #define LEXI_TYPES_HPP
@@ -53,6 +54,13 @@ struct GlyphParams
     }
 
     operator Point() const { return {x, y}; }
+
+    friend std::ostream& operator<<(std::ostream&os, const GlyphParams& params)
+    {
+        os << "X: " << params.x << " Y: " << params.y << " W: " << params.width << " H: " << params.height;
+        return os;
+    }
+
 };
 
 #endif  // LEXI_TYPES_HPP

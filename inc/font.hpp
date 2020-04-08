@@ -9,7 +9,6 @@
 #include "window.hpp"
 #include "window_impl.hpp"
 
-#include <iostream>
 #include <set>
 
 namespace {

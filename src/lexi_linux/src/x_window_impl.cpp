@@ -1,14 +1,14 @@
 //
 // Created by romaonishuk on 27.10.19.
 //
-
 #include "x_window_impl.hpp"
-#include "logger.hpp"
 #include "font.hpp"
+#include "logger.hpp"
 
 namespace Gui {
 XWindowImpl::XWindowImpl(const GlyphParams& params)
 {
+    XInitThreads();
     m_display = XOpenDisplay(nullptr);
     if(!m_display) {
         throw std::runtime_error("XWindowImpl display initialisation failed!");
@@ -74,7 +74,7 @@ void XWindowImpl::CreateWindow(const GlyphParams& params)
 
 void XWindowImpl::CreateGraphicContext()
 {
-    unsigned int line_width = 1; /* line width for the GC.       */
+    unsigned int line_width = 0; /* line width for the GC.       */
     int line_style = LineSolid;  /* style for lines drawing and  */
     int cap_style = CapRound;    /* style of the line's edje and */
     int join_style = JoinRound;  /*  joined lines.		*/
@@ -98,7 +98,48 @@ void XWindowImpl::DrawRectangle(const Point& point, const width_t width, const h
 
 void XWindowImpl::DrawText(const Point& text_position, std::string text)
 {
-    XDrawString(m_display, m_window, m_gc, text_position.x, text_position.y, text.c_str(), text.length());
+    XTextItem item;
+    item.chars = const_cast<char*>(text.c_str());
+    item.nchars = text.size();
+    item.delta = 0;
+    item.font = None;
+
+    XDrawText(m_display, m_window, m_gc, text_position.x, text_position.y, &item, 1);
+}
+
+void XWindowImpl::DrawText(const GlyphParams& params, const std::string& text, Alignment alignment)
+{
+    auto* fontInfo = XQueryFont(m_display, Lexi::FontManager::Get().GetFontId());
+    if(!fontInfo) {
+        std::cout << "Failed to load font information" << std::endl;
+        return;
+    }
+
+    int direction_return = 0;
+    int font_ascent_return = 0, font_descent_return = 0;
+    XCharStruct overall_return;
+
+    XTextExtents(fontInfo, text.c_str(), text.size(), &direction_return, &font_ascent_return, &font_descent_return,
+                 &overall_return);
+
+    Point point;
+    // TODO(rmn): errors + too long/big words + other cases where descent !=0 + include bearing
+    switch(alignment) {
+        case Alignment::kCenter:
+            point.x = params.x + params.width / 2 - overall_return.width / 2;
+            point.y = params.y + params.height / 2 + overall_return.ascent / 2;
+            break;
+        case Alignment::kRight:
+            point.x = params.x + params.width - overall_return.width;
+            point.y = params.y + params.height / 2 + overall_return.ascent / 2;
+            break;
+        case Alignment::kLeft:
+            point.x = params.x;
+            point.y = params.y + params.height / 2 + overall_return.ascent / 2;
+            break;
+    }
+
+    DrawText(point, text);
 }
 
 void XWindowImpl::DrawLine(const Point& start_point, const Point& end_point)
@@ -228,41 +269,6 @@ std::set<Lexi::FontName> XWindowImpl::GetFontList()
     XFreeFontInfo(fontsInfoList, info_return, countReturn);
 
     return fontsList;
-}
-
-void XWindowImpl::DrawText(const GlyphParams& params, const std::string& text, Alignment alignment)
-{
-    auto* fontInfo = XQueryFont(m_display, Lexi::FontManager::Get().GetFontId());
-    if(!fontInfo) {
-        std::cout << "Failed to load font information" << std::endl;
-        return;
-    }
-
-    int direction_return = 0;
-    int font_ascent_return = 0, font_descent_return = 0;
-    XCharStruct overall_return;
-
-    XTextExtents(fontInfo, text.c_str(), text.size(), &direction_return, &font_ascent_return, &font_descent_return,
-        &overall_return);
-
-    Point point;
-    // TODO(rmn): errors + too long/big words + other cases where descent !=0 + include bearing
-    switch(alignment) {
-        case Alignment::kCenter:
-            point.x = params.x + params.width / 2 - overall_return.width / 2;
-            point.y = params.y + params.height / 2 + overall_return.ascent / 2;
-            break;
-        case Alignment::kRight:
-            point.x = params.x + params.width - overall_return.width;
-            point.y = params.y + params.height / 2 + overall_return.ascent / 2;
-            break;
-        case Alignment::kLeft:
-            point.x = params.x;
-            point.y = params.y + params.height / 2 + overall_return.ascent / 2;
-            break;
-    }
-
-    DrawText(point, text);
 }
 
 }  // namespace Gui

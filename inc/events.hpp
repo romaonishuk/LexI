@@ -17,6 +17,15 @@ enum class EventType
     FocusedIn
 };
 
+enum class Key
+{
+    kSpace = 0x0020,
+    kTilde = 0x007e,
+    kEnter = 0xff0d,
+    kArrowUp = 0xff52,
+    kArrowDown = 0xff54
+};
+
 class Event
 {
 public:
@@ -34,10 +43,13 @@ private:
 class KeyBoardEvent: public Event
 {
 public:
-    KeyBoardEvent(const Point&p, const std::string& key):Event(p, EventType::KeyPressed), m_key(key){
-
+    KeyBoardEvent(const Point& p, uint32_t key): Event(p, EventType::KeyPressed), m_key(key) {}
+    bool IsString() const
+    {
+        return m_key >= static_cast<uint32_t>(Key::kSpace) && m_key <= static_cast<uint32_t>(Key::kTilde);
     }
-    std::string m_key;
+
+    uint32_t m_key;
 };
 }  // namespace Lexi
 

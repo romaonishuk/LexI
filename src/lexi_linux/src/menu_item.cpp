@@ -6,8 +6,6 @@
 #include "i_command.hpp"
 #include "window.hpp"
 
-#include <iostream>
-
 namespace Gui {
 void MenuItem::SetCommand(std::unique_ptr<ICommand> cmd)
 {
