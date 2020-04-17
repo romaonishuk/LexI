@@ -17,7 +17,5 @@ std::unique_ptr<Gui::WindowImpl> WindowSystemFactory::MakeWindowImpl(const Glyph
 std::unique_ptr<Gui::WindowImpl> WindowSystemFactory::MakeChildWindowImpl(
     const GlyphParams& params, Gui::WindowImpl* windowImpl)
 {
-    auto p = dynamic_cast<Gui::XWindowImpl*>(windowImpl);
-    auto ptr = std::make_unique<Gui::XWindowImpl>(params, p);
-    return ptr;
+    return std::make_unique<Gui::XWindowImpl>(params, dynamic_cast<Gui::XWindowImpl*>(windowImpl));
 }

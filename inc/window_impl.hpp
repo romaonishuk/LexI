@@ -13,7 +13,7 @@
 namespace Lexi {
 struct Font;
 struct FontName;
-}
+}  // namespace Lexi
 
 namespace Gui {
 class WindowImpl

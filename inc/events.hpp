@@ -22,8 +22,13 @@ enum class Key
     kSpace = 0x0020,
     kTilde = 0x007e,
     kEnter = 0xff0d,
+
+    kBackspace = 0xff08,
+    kArrowLeft = 0xff51,
     kArrowUp = 0xff52,
-    kArrowDown = 0xff54
+    kArrowRight = 0xff53,
+    kArrowDown = 0xff54,
+
 };
 
 class Event
@@ -44,6 +49,7 @@ class KeyBoardEvent: public Event
 {
 public:
     KeyBoardEvent(const Point& p, uint32_t key): Event(p, EventType::KeyPressed), m_key(key) {}
+    KeyBoardEvent(const Point& p, Key key): Event(p, EventType::KeyPressed), m_key(static_cast<uint32_t>(key)) {}
     bool IsString() const
     {
         return m_key >= static_cast<uint32_t>(Key::kSpace) && m_key <= static_cast<uint32_t>(Key::kTilde);
