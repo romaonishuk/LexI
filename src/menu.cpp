@@ -45,7 +45,7 @@ void Menu::InitMenuWindow()
 
     width_t width = defaultWidth;
 
-    unsigned int index = 0;
+    int index = 0;
     for(auto& it: m_components) {
         it->SetGlyphParams({0, index * defaultHeight, defaultWidth, defaultHeight});
         mMenuWindow->Add(it);

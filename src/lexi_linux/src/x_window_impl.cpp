@@ -182,7 +182,7 @@ void XWindowImpl::Resize(width_t width, height_t height)
 {
     XWindowAttributes attr;
     XGetWindowAttributes(m_display, m_window, &attr);
-    if(static_cast<unsigned int>(attr.height) != height || static_cast<unsigned int>(attr.width) != width) {
+    if(attr.height != height || attr.width != width) {
         XResizeWindow(m_display, m_window, width, height);
     }
 }
