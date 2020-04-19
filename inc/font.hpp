@@ -61,6 +61,11 @@ struct Font
     uint32_t m_fontSize = 14;
     Weight m_weight = Weight::kMedium;
     Slant m_slant = Slant::kNormal;
+
+    uint32_t m_charAscent = 0;
+    uint32_t m_charDescent = 0;
+    uint32_t m_charHeight = 0;
+    uint32_t m_charWidth = 0;
 };
 
 class FontManager
@@ -76,6 +81,11 @@ public:
     void SetFontSlant(const Font::Slant& s);
     void SetFontSize(const std::string& fontSize);
     unsigned long GetFontId() { return m_currentFont.m_fontId; };
+
+    uint32_t GetCharHeight() const { return m_currentFont.m_charHeight;}
+    uint32_t GetCharWidth() const { return m_currentFont.m_charWidth;}
+    uint32_t GetCharDescent() const { return m_currentFont.m_charDescent;}
+    uint32_t GetCharAscent() const { return m_currentFont.m_charAscent;}
 
     std::vector<std::string> GetFontList();
 

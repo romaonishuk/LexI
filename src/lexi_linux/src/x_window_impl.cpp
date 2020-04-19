@@ -235,6 +235,11 @@ bool XWindowImpl::ChangeFont(Lexi::Font& font)
     if(result) {
         XSetFont(m_display, m_gc, result->fid);
         font.m_fontId = result->fid;
+
+        font.m_charWidth = result->max_bounds.width;
+        font.m_charAscent = result->max_bounds.ascent;
+        font.m_charDescent = result->max_bounds.descent;
+        font.m_charHeight = result->max_bounds.ascent + result->max_bounds.descent;
         //        XFreeFont(m_display, fontInfo);
         return true;
     }
