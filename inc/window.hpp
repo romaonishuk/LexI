@@ -9,7 +9,6 @@
 
 #include "i_composite_glyph.hpp"
 #include "i_glyph.hpp"
-// TODO: WindowImpl should be private for Window
 #include "types.hpp"
 #include "window_impl.hpp"
 
@@ -28,11 +27,13 @@ public:
     void Draw(Gui::Window*) override;
     void ReDraw();
     void DrawRectangle(const Point& point, const width_t width, const height_t height) const;
-    void DrawText(const Point& text_position, std::string text) const;
-    void DrawText(const GlyphParams&, const std::string&, Alignment);
-    void DrawLine(const Point& start_point, const Point& end_point) const;
+    virtual void DrawRectangle(const GlyphParams& params) const;
+    virtual void DrawText(const Point& text_position, std::string text) const;
+    virtual void DrawText(const GlyphParams&, const std::string&, Alignment);
+    virtual void DrawLine(const Point& start_point, const Point& end_point) const;
 
     void FillRectangle(const Point& point, const width_t width, const height_t height, const Color color);
+    virtual void FillRectangle(const GlyphParams& params, const Color color);
 
     void SetForeground(int color) const;
 
@@ -52,6 +53,9 @@ public:
     void ShowWindow() const;
     void HideWindow() const;
 
+    [[nodiscard]] virtual std::string GetWindowName() const {
+        return "Main Window";
+    }
 protected:
     friend EventManager;
     std::unique_ptr<WindowImpl> m_window_impl;
@@ -68,6 +72,10 @@ public:
 
     void SetCurrentMenuItem(GlyphPtr item) {
         m_currentMenuItem = std::move(item);
+    }
+
+    [[nodiscard]] std::string GetWindowName() const override {
+        return "Child Window";
     }
 private:
     // TODO(rmn): weak_ptr

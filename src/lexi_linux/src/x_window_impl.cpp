@@ -1,7 +1,9 @@
 //
 // Created by romaonishuk on 27.10.19.
 //
+
 #include "x_window_impl.hpp"
+
 #include "font.hpp"
 #include "logger.hpp"
 
@@ -20,7 +22,7 @@ XWindowImpl::XWindowImpl(const GlyphParams& params)
     std::cout << "XWindowImpl created!" << std::endl;
 }
 
-XWindowImpl::XWindowImpl(const GlyphParams params, XWindowImpl* parentImpl):
+XWindowImpl::XWindowImpl(const GlyphParams& params, XWindowImpl* parentImpl):
     m_display(parentImpl->m_display),
     m_gc(parentImpl->m_gc)
 {
@@ -120,7 +122,7 @@ void XWindowImpl::DrawText(const GlyphParams& params, const std::string& text, A
     XCharStruct overall_return;
 
     XTextExtents(fontInfo, text.c_str(), text.size(), &direction_return, &font_ascent_return, &font_descent_return,
-                 &overall_return);
+        &overall_return);
 
     Point point;
     // TODO(rmn): errors + too long/big words + other cases where descent !=0 + include bearing

@@ -30,6 +30,11 @@ public:
     using GlyphPtr = std::shared_ptr<IGlyph>;
 
     virtual void Draw(Gui::Window*) = 0;  // TODO: const?
+    /**
+     * @brief           Draw current glyph at specific position.
+     * @param point     New position of glyph.
+     */
+    virtual void DrawAt(Gui::Window* w, const Point& point) { Draw(w); }
     virtual void ReDraw(Gui::Window* w)
     {
         ClearGlyph(w);

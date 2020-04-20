@@ -13,6 +13,8 @@
 #include "text_label.hpp"
 #include "text_view.hpp"
 #include "window.hpp"
+#include "page.hpp"
+#include "scroller.hpp"
 
 const auto Version = "Lexi v1.0";
 
@@ -26,8 +28,8 @@ int main()
     GlyphParams initial_window_params;
     initial_window_params.x = 0;
     initial_window_params.y = 0;
-    initial_window_params.width = 800;
-    initial_window_params.height = 1024;
+    initial_window_params.width = 1920;
+    initial_window_params.height = 1080;
 
     Gui::Window window(initial_window_params);
     EventManager eventManager(&window);
@@ -35,7 +37,7 @@ int main()
 
     Lexi::FontManager::Get().Init(&window);
 
-    const auto defaultFont = "Ubuntu";
+    const auto defaultFont = "clean";
     Lexi::FontManager::Get().SetFont(defaultFont);
 
     auto top_panel =
@@ -57,15 +59,18 @@ int main()
     top_panel->Add(fontsMenu);
     eventManager.addWindow(fontsMenu->getMenuWindow());
 
+    //    auto text_view_border = std::make_shared<BorderDecorator>(GlyphParams{459, 99, 801, 200}, Color::kBlack);
+//    text_view_border->Add(std::make_shared<TextView>(GlyphParams{460, 100, 800, 100}));
+    auto text_view = std::make_shared<TextView>(GlyphParams{360, 100, 1200, 400}, &window);
+    window.Add(text_view);
+    eventManager.addWindow(text_view.get());
+
     auto fontSizeMenu = std::make_shared<Gui::DropDownMenu>(GlyphParams{365, 10, 80, 20}, "12", &window);
     top_panel->Add(fontSizeMenu);
     eventManager.addWindow(fontSizeMenu->getMenuWindow());
 
-    auto text_view_border = std::make_shared<BorderDecorator>(GlyphParams{40, 100, 700, 800}, Color::kBlack);
-    text_view_border->Add(std::make_shared<TextView>(GlyphParams{40, 100, 700, 800}));
-    window.Add(text_view_border);
-
-    auto scroll_board = std::make_shared<BorderDecorator>(GlyphParams{750, 100, 20, 800}, Color::kBlack);
+    auto scroll_board = std::make_shared<BorderDecorator>(GlyphParams{1900, 100, 20, 800}, Color::kBlack);
+    scroll_board->Add(std::make_shared<Scroller>(GlyphParams{1905, 200, 10, 40}));
     window.Add(scroll_board);
 
     auto bottom_panel =
@@ -96,6 +101,7 @@ int main()
             status_line->ChangeText(it, &window);
             bottom_panel->Draw(&window);
         });
+        menuItem->SetOnButtonPressedAction([&, it] { Lexi::FontManager::Get().SetFont(it); });
     }
 
     for(const auto& it: supportedFontSizes) {

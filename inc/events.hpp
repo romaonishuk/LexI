@@ -54,6 +54,7 @@ public:
     {
         return m_key >= static_cast<uint32_t>(Key::kSpace) && m_key <= static_cast<uint32_t>(Key::kTilde);
     }
+    [[nodiscard]] Key GetKey() const { return static_cast<Key>(m_key); }
 
     uint32_t m_key;
 };

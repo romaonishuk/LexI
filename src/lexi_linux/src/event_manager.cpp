@@ -9,6 +9,7 @@
 #include <algorithm>
 #include "event_manager.hpp"
 
+#include "cursor.hpp"
 #include "lexi_linux/inc/x_window_impl.hpp"
 #include "window.hpp"
 
@@ -30,6 +31,8 @@ bool EventManager::ChangeCurrentWindow(unsigned long window)
         return false;
     }
 
+    std::cout << "Window changed from: " << m_currentWindow->GetWindowName() << " to: " << (*windowsIt)->GetWindowName()
+              << std::endl;
     m_currentWindow = *windowsIt;
     return true;
 }
@@ -42,7 +45,7 @@ void EventManager::RunLoop()
         XEvent event;
         XNextEvent(display, &event);
 
-        Point p{static_cast<uint32_t>(event.xbutton.x), static_cast<uint32_t>(event.xbutton.y)};
+        Point p{event.xbutton.x, event.xbutton.y};
         switch(event.type) {
             case Expose:
                 if(ChangeCurrentWindow(event.xexpose.window)) {
@@ -80,8 +83,21 @@ void EventManager::RunLoop()
             case FocusOut:
                 std::cout << "Focus out" << std::endl;
                 break;
+            case KeyPress: {
+                auto mykey = XkbKeycodeToKeysym(display, event.xkey.keycode, 0, event.xkey.state & ShiftMask ? 1 : 0);
+                if(mykey == NoSymbol) {
+                    std::cout << "Wrong Key:" << std::endl;
+                } else {
+                    // If cursor is active redirect key press action to it
+                    // TODO(rmn): need stabilization
+                    m_currentWindow->ProcessEvent(
+                        m_currentWindow, Lexi::KeyBoardEvent(Lexi::Cursor::Get().GetPosition(), mykey));
+                }
+            } break;
+            case KeyRelease:
             case EnterNotify:
             case LeaveNotify:
+            case ConfigureNotify:
                 break;
             default:
                 std::cout << "RMN unprocessed event:" << event.type << std::endl;

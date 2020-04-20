@@ -5,8 +5,8 @@
 #ifndef LEXI_X_WINDOW_IMPL_CPP_HPP
 #define LEXI_X_WINDOW_IMPL_CPP_HPP
 
-#include "window_impl.hpp"
 #include "font.hpp"
+#include "window_impl.hpp"
 
 #include <X11/Xlib.h>
 
@@ -15,7 +15,8 @@ class XWindowImpl: public WindowImpl
 {
 public:
     explicit XWindowImpl(const GlyphParams&);
-    explicit XWindowImpl(const GlyphParams, XWindowImpl*);
+    // TODO(rmn): mb make static creator
+    explicit XWindowImpl(const GlyphParams&, XWindowImpl*);
     ~XWindowImpl() override;
 
     void DrawRectangle(const Point& point, const width_t width, const height_t height) override;
@@ -30,9 +31,9 @@ public:
     void ShowWindow() override;
     void HideWindow() override;
 
-    unsigned long GetWindow() const override { return m_window; }
-
-    void* GetDisplay() const override { return m_display; }
+    [[nodiscard]] unsigned long GetWindow() const override { return m_window; }
+    [[nodiscard]] void* GetDisplay() const override { return m_display; }
+    [[nodiscard]] ::GC GetGc() const { return m_gc; }
 
     void ClearWindow() override;
     void ClearGlyph(const GlyphParams& p, bool sendExposureEvent) override;
@@ -42,13 +43,14 @@ public:
 
     std::set<Lexi::FontName> GetFontList() override;
     bool ChangeFont(Lexi::Font&) override;
+
 private:
     void CreateWindow(const GlyphParams& params);
     void CreateGraphicContext();
 
-    ::Display* m_display;
-    ::Window m_window;
-    ::GC m_gc;
+    ::Display* m_display = nullptr;
+    ::Window m_window = 0;
+    ::GC m_gc = nullptr;
 
     bool m_isChild = false;
 };

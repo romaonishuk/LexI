@@ -41,9 +41,14 @@ void Window::SetForeground(int color) const
     m_window_impl->SetForeground(color);
 }
 
-void Window::DrawRectangle(const Point& point, const width_t width, const height_t heigth) const
+void Window::DrawRectangle(const Point& point, const width_t width, const height_t height) const
 {
-    m_window_impl->DrawRectangle(point, width, heigth);
+    m_window_impl->DrawRectangle(point, width, height);
+}
+
+void Window::DrawRectangle(const GlyphParams& params) const
+{
+    m_window_impl->DrawRectangle({params.x, params.y}, params.width, params.height);
 }
 
 void Window::DrawText(const Point& text_position, std::string text) const
@@ -64,6 +69,11 @@ void Window::DrawLine(const Point& start_point, const Point& end_point) const
 void Window::FillRectangle(const Point& point, const width_t width, const height_t height, const Color color)
 {
     m_window_impl->FillRectangle(point, width, height, color);
+}
+
+void Window::FillRectangle(const GlyphParams& params, const Color color)
+{
+    m_window_impl->FillRectangle({params.x, params.y}, params.width, params.height, color);
 }
 
 void Window::ShowWindow() const

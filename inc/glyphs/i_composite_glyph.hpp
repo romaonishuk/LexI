@@ -22,6 +22,13 @@ public:
         }
     }
 
+    void DrawAt(Gui::Window* window, const Point& point) override
+    {
+        for(auto& it: m_components) {
+            it->DrawAt(window, point);
+        }
+    }
+
     ~ICompositeGlyph() override = default;
 
     void Insert(GlyphPtr glyph, size_t pos) override
