@@ -106,7 +106,7 @@ void ChildWindow::ProcessEvent(Gui::Window* w, const Event& event)
     for(const auto& it: m_components) {
         if(it->Intersects(event.GetPoint())) {
             // Menu item hasn't changed
-            if(event.GetEvent() == EventType::FocusedIn && m_currentMenuItem) {
+            if(event.GetEvent() == EventType::MouseMotion && m_currentMenuItem) {
                 if(it == m_currentMenuItem) {
                     return;
                 }

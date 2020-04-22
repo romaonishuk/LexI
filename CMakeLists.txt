@@ -4,7 +4,7 @@ project(LexI)
 set(CMAKE_CXX_STANDARD 17)
 
 # TODO(rmn): sanitizers
-set(CMAKE_CXX_FLAGS "-O3 -Werror -Wall -Wno-narrowing -Wno-sign-compare")
+set(CMAKE_CXX_FLAGS "-O3 -Werror -Wall -Wno-narrowing -Wno-sign-compare")  # TODO(rmn): remove Wno
 
 # interface lib
 add_library(lexi_interface INTERFACE)

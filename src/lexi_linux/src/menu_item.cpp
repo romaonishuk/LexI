@@ -46,7 +46,7 @@ void MenuItem::Draw(Window* w)
 void MenuItem::ProcessEvent(Gui::Window* w, const Event& event)
 {
     switch(event.GetEvent()) {
-        case EventType::ButtonPressed:
+        case EventType::MouseButtonPressed:
             w->SetForeground(Color::kWhite);
 
             // bottom
@@ -70,13 +70,13 @@ void MenuItem::ProcessEvent(Gui::Window* w, const Event& event)
             }
 
             break;
-        case EventType::ButtonReleased:
+        case EventType::MouseButtonReleased:
             Draw(w);
             if(m_command) {
                 m_command->Execute();
             }
             break;
-        case EventType::FocusedIn:
+        case EventType::MouseMotion:
             w->FillRectangle(m_params, m_params.width, m_params.height, kLightBlue);
             w->SetForeground(Color::kBlack);
             w->DrawText(m_params, m_text, Alignment::kLeft);

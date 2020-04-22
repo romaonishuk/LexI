@@ -10,11 +10,11 @@
 #include "i_glyph.hpp"
 #include "menu.hpp"
 #include "menu_item.hpp"
+#include "page.hpp"
+#include "scroller.hpp"
 #include "text_label.hpp"
 #include "text_view.hpp"
 #include "window.hpp"
-#include "page.hpp"
-#include "scroller.hpp"
 
 const auto Version = "Lexi v1.0";
 
@@ -59,19 +59,16 @@ int main()
     top_panel->Add(fontsMenu);
     eventManager.addWindow(fontsMenu->getMenuWindow());
 
-    //    auto text_view_border = std::make_shared<BorderDecorator>(GlyphParams{459, 99, 801, 200}, Color::kBlack);
-//    text_view_border->Add(std::make_shared<TextView>(GlyphParams{460, 100, 800, 100}));
-    auto text_view = std::make_shared<TextView>(GlyphParams{360, 100, 1200, 400}, &window);
+    auto text_view = std::make_shared<TextView>(GlyphParams{360, 100, 1200, 800}, &window);
     window.Add(text_view);
     eventManager.addWindow(text_view.get());
+
+    auto scroll_board = std::make_shared<Scroller>(GlyphParams{1895, 100, 20, 800}, text_view);
+    window.Add(scroll_board);
 
     auto fontSizeMenu = std::make_shared<Gui::DropDownMenu>(GlyphParams{365, 10, 80, 20}, "12", &window);
     top_panel->Add(fontSizeMenu);
     eventManager.addWindow(fontSizeMenu->getMenuWindow());
-
-    auto scroll_board = std::make_shared<BorderDecorator>(GlyphParams{1900, 100, 20, 800}, Color::kBlack);
-    scroll_board->Add(std::make_shared<Scroller>(GlyphParams{1905, 200, 10, 40}));
-    window.Add(scroll_board);
 
     auto bottom_panel =
         std::make_shared<BorderDecorator>(GlyphParams{0, 925, initial_window_params.width, 20}, Color::kBlack);
@@ -109,6 +106,13 @@ int main()
         item->SetOnButtonPressedAction([it] { Lexi::FontManager::Get().SetFontSize(it); });
         fontSizeMenu->Add(std::move(item));
     }
+
+    text_view->SetOnPageAddedAction([&]() {
+        scroll_board->UpdateScaling();
+        scroll_board->UpdateScrollerPosition(&window);
+    });
+
+    text_view->SetOnVisibleAreaUpdateAction([&] { scroll_board->UpdateScrollerPosition(&window); });
 
     eventManager.RunLoop();
 }

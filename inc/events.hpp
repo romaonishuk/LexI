@@ -12,9 +12,10 @@ enum class EventType
 {
     kNone = 0,
     KeyPressed,
-    ButtonPressed,
-    ButtonReleased,
-    FocusedIn
+    MouseButtonPressed,
+    MouseButtonReleased,
+    MouseMotion,
+    Scroll
 };
 
 enum class Key
@@ -50,7 +51,7 @@ class KeyBoardEvent: public Event
 public:
     KeyBoardEvent(const Point& p, uint32_t key): Event(p, EventType::KeyPressed), m_key(key) {}
     KeyBoardEvent(const Point& p, Key key): Event(p, EventType::KeyPressed), m_key(static_cast<uint32_t>(key)) {}
-    bool IsString() const
+    [[nodiscard]] bool IsString() const
     {
         return m_key >= static_cast<uint32_t>(Key::kSpace) && m_key <= static_cast<uint32_t>(Key::kTilde);
     }
@@ -58,6 +59,48 @@ public:
 
     uint32_t m_key;
 };
+
+class MouseButtonPressedEvent: public Event
+{
+public:
+    enum class MouseButton
+    {
+        kLeft,
+        kMiddle,
+        kRight
+    };
+
+    MouseButtonPressedEvent(const Point& p, const MouseButton& button):
+        Event(p, EventType::MouseButtonPressed),
+        m_button(button)
+    {}
+
+    [[nodiscard]] MouseButton GetButton() const { return m_button; }
+
+private:
+    MouseButton m_button;
+};
+
+class ScrollEvent: public Event
+{
+public:
+    enum class Direction
+    {
+        kUp,
+        kDown
+    };
+
+    ScrollEvent(const Point& p, Direction direction): Event(p, EventType::Scroll), m_direction(direction) {}
+
+    [[nodiscard]] height_t GetScrolledDistance() const { return scrollDistance; }
+    [[nodiscard]] Direction GetDirection() const { return m_direction; }
+
+private:
+    // TODO(rmn): static
+    const height_t scrollDistance = 15;  // px
+    Direction m_direction;
+};
+
 }  // namespace Lexi
 
 #endif  // LEXI_I_EVENT_HPP

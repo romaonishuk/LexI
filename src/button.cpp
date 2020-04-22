@@ -36,11 +36,16 @@ void Button::Draw(Gui::Window* w)
 void Button::ProcessEvent(Gui::Window* w, const Event& event)
 {
     switch(event.GetEvent()) {
-        case EventType::ButtonPressed:
+        case EventType::MouseButtonPressed:
             OnButtonPressed(w);
+            m_isPressed = true;
             break;
-        case EventType::ButtonReleased:
-            OnButtonReleased(w);
+        case EventType::MouseButtonReleased:
+            if(m_isPressed) {
+                OnButtonReleased(w);
+            }
+
+            m_isPressed = false;
             break;
         default:
             // TODO(rmn): add log

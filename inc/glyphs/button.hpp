@@ -20,8 +20,11 @@ public:
 
     void ProcessEvent(Gui::Window* w, const Event& event) override;
 
-public:
+    [[nodiscard]] bool IsPressed() const { return m_isPressed; }
+
+private:
     std::string m_text;
+    bool m_isPressed = false;
 };
 
-#endif  //LEXI_BUTTON_HPP
+#endif  // LEXI_BUTTON_HPP

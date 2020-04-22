@@ -60,6 +60,7 @@ public:
     width_t GetWidth() const { return m_params.width; }
     height_t GetHeight() const { return m_params.height; }
     Point GetPosition() const { return {m_params.x, m_params.y}; }
+    height_t GetBottomPosition() const { return m_params.y + m_params.height; }
 
 protected:
     GlyphParams m_params;

@@ -39,6 +39,7 @@ bool EventManager::ChangeCurrentWindow(unsigned long window)
 
 void EventManager::RunLoop()
 {
+    using namespace Lexi;
     // TODO(rmn): redesign this
     auto* display = reinterpret_cast<::Display*>(m_mainWindow->m_window_impl->GetDisplay());
     while(!stopLoop) {
@@ -60,12 +61,29 @@ void EventManager::RunLoop()
                 return;
             case ButtonPress:
                 if(ChangeCurrentWindow(event.xbutton.window)) {
-                    m_currentWindow->ProcessEvent(m_currentWindow, {p, EventType::ButtonPressed});
+                    switch(event.xbutton.button) {
+                        case Button1:
+                            m_currentWindow->ProcessEvent(m_currentWindow, {p, EventType::MouseButtonPressed});
+                            break;
+                        case Button2:
+                            break;
+                        case Button3:
+                            break;
+                        case Button4:
+                            m_currentWindow->ProcessEvent(m_currentWindow, ScrollEvent{p, ScrollEvent::Direction::kUp});
+                            break;
+                        case Button5:
+                            m_currentWindow->ProcessEvent(
+                                m_currentWindow, ScrollEvent{p, ScrollEvent::Direction::kDown});
+                            break;
+                        default:
+                            break;
+                    }
                 }
                 break;
             case ButtonRelease:
                 if(m_currentWindow->m_window_impl->GetWindow() == event.xbutton.window) {
-                    m_currentWindow->ProcessEvent(m_currentWindow, {p, EventType::ButtonReleased});
+                    m_currentWindow->ProcessEvent(m_currentWindow, {p, EventType::MouseButtonReleased});
                 }
                 break;
             case ClientMessage:
@@ -75,7 +93,8 @@ void EventManager::RunLoop()
             case CreateNotify:
                 break;
             case MotionNotify:
-                m_currentWindow->ProcessEvent(m_currentWindow, {p, EventType::FocusedIn});
+                //                std::cout << "X: " << p.x << " Y: " << p.y << std::endl;
+                m_currentWindow->ProcessEvent(m_currentWindow, {p, EventType::MouseMotion});
                 break;
             case FocusIn:
                 std::cout << "Focus in" << std::endl;

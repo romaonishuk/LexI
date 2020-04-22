@@ -31,9 +31,9 @@ void Menu::Draw(Window* w)
 void Menu::ProcessEvent(Gui::Window* w, const Event& event)
 {
     const auto& ev = event.GetEvent();
-    if(ev == EventType::ButtonPressed) {
+    if(ev == EventType::MouseButtonPressed) {
         mMenuWindow->ShowWindow();
-    } else if(ev == EventType::ButtonReleased) {
+    } else if(ev == EventType::MouseButtonReleased) {
         mMenuWindow->HideWindow();
     }
 }

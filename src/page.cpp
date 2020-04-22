@@ -56,35 +56,25 @@ void Page::ProcessEvent(Gui::Window* window, const Event& event)
                 Add(m_currentRow);
                 m_currentRow->DrawCursor(window);
             } else {
-                // switch page
+                m_parent->SwitchPage(window, TextView::SwitchDirection::kNext, true);
             }
-
         } break;
         case Lexi::Key::kArrowUp: {
             if(m_currentRow == m_components.front()) {
-                // switch page
+                m_parent->SwitchPage(window, TextView::SwitchDirection::kPrev, true);
             } else {
                 auto rowIt = std::find(m_components.begin(), m_components.end(), m_currentRow);
                 m_currentRow = std::static_pointer_cast<Row>(*(std::prev(rowIt)));
                 m_currentRow->DrawCursor(window);
-
-                // Show page header
-                if(m_currentRow == m_components.front()) {
-                    m_parent->UpdateVisibleArea(m_params.y);
-                }
             }
         } break;
         case Lexi::Key::kArrowDown: {
             if(m_currentRow == m_components.back()) {
-                // switch page
+                m_parent->SwitchPage(window, TextView::SwitchDirection::kNext, false);
             } else {
                 auto rowIt = std::find(m_components.begin(), m_components.end(), m_currentRow);
                 m_currentRow = std::static_pointer_cast<Row>(*(std::next(rowIt)));
                 m_currentRow->DrawCursor(window);
-
-                if(m_currentRow == m_components.back()) {
-                    m_parent->MoveVisibleArea(m_botIndent + 1);
-                }
             }
         } break;
         case Lexi::Key::kArrowLeft: {
