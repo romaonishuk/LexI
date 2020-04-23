@@ -26,14 +26,22 @@ Window::~Window() = default;
 
 void Window::Draw(Gui::Window* window)
 {
-    //        m_window_impl->Redraw()
     ICompositeGlyph::Draw(window);
 }
 
-void Window::ReDraw()
+void Window::ReDraw(Gui::Window*)
 {
     m_window_impl->ClearWindow();
     Gui::Window::Draw(this);
+}
+
+void Window::ProcessEvent(Gui::Window* w, const Event& event)
+{
+    for(const auto& it: m_components) {
+        if(it->Intersects(event.GetPoint())) {
+            return it->ProcessEvent(w, event);
+        }
+    }
 }
 
 void Window::SetForeground(int color) const
@@ -76,47 +84,16 @@ void Window::FillRectangle(const GlyphParams& params, const Color color)
     m_window_impl->FillRectangle({params.x, params.y}, params.width, params.height, color);
 }
 
-void Window::ShowWindow() const
+void Window::ShowWindow()
 {
+    m_isVisible = true;
     m_window_impl->ShowWindow();
 }
 
-void Window::HideWindow() const
+void Window::HideWindow()
 {
+    m_isVisible = false;
     m_window_impl->HideWindow();
-}
-
-// --- ChildWindow ---
-ChildWindow::ChildWindow(const GlyphParams& params, Window* parent): Window(params, parent), m_parent(parent)
-{}
-
-void ChildWindow::Draw([[maybe_unused]] Gui::Window* w)
-{
-    m_window_impl->SetForeground(kBlack);
-    Gui::Window::Draw(this);
-}
-
-void ChildWindow::Resize(width_t width, height_t height)
-{
-    m_window_impl->Resize(width, height);
-}
-
-void ChildWindow::ProcessEvent(Gui::Window* w, const Event& event)
-{
-    for(const auto& it: m_components) {
-        if(it->Intersects(event.GetPoint())) {
-            // Menu item hasn't changed
-            if(event.GetEvent() == EventType::MouseMotion && m_currentMenuItem) {
-                if(it == m_currentMenuItem) {
-                    return;
-                }
-
-                m_currentMenuItem->ReDraw(this);
-            }
-            SetCurrentMenuItem(it);
-            return it->ProcessEvent(w, event);
-        }
-    }
 }
 
 }  // namespace Gui

@@ -53,7 +53,7 @@ void XWindowImpl::CreateWindow(const GlyphParams& params)
     auto visual = DefaultVisual(m_display, screen);
     auto depth = DefaultDepth(m_display, screen);
     XSetWindowAttributes attributes;
-    attributes.background_pixel = 0xC0C0C0;  // XWhitePixel(m_display, screen);
+    attributes.background_pixel = Color::kGray;  // XWhitePixel(m_display, screen);
 
     // TODO(rmn): check errors
     m_window = XCreateWindow(m_display, XRootWindow(m_display, screen), params.x, params.y, params.width, params.height,
@@ -243,6 +243,7 @@ bool XWindowImpl::ChangeFont(Lexi::Font& font)
         font.m_charDescent = result->max_bounds.descent;
         font.m_charHeight = result->max_bounds.ascent + result->max_bounds.descent;
         //        XFreeFont(m_display, fontInfo);
+
         return true;
     }
 

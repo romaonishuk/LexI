@@ -5,13 +5,52 @@
 #include "menu.hpp"
 #include "i_command.hpp"
 
-// TODO(rmn): remove copy-paste
+#include "graphic_primitives.hpp"
 
-// TODO(rmn): Menu improvement: it width and heigth should be calculated relatively to MenuItems
 namespace Gui {
+
+// --- MenuWindow ---
+MenuWindow::MenuWindow(const GlyphParams& params, Window* parent): Window(params, parent), m_parent(parent)
+{
+    m_hideOnWindowSwitch = true;
+    m_isVisible = false;
+}
+
+void MenuWindow::Draw([[maybe_unused]] Gui::Window* w)
+{
+    m_window_impl->SetForeground(kBlack);
+    Gui::Window::Draw(this);
+}
+
+void MenuWindow::Resize(width_t width, height_t height)
+{
+    m_window_impl->Resize(width, height);
+}
+
+void MenuWindow::ProcessEvent(Gui::Window* w, const Event& event)
+{
+    for(const auto& it: m_components) {
+        if(it->Intersects(event.GetPoint())) {
+            // Menu item hasn't changed
+            if(event.GetEvent() == EventType::MouseMotion && m_currentMenuItem) {
+                if(it == m_currentMenuItem) {
+                    return;
+                }
+
+                m_currentMenuItem->ReDraw(this);
+            }
+            std::cout << "Eve:"  << event.GetPoint().y << std::endl;
+            SetCurrentMenuItem(it);
+            return it->ProcessEvent(w, event);
+        }
+    }
+}
+
+// --- Menu ---
+
 Menu::Menu(const GlyphParams& p, const std::string& title, Window* w):
     ICompositeGlyph(p),
-    mMenuWindow(std::make_unique<ChildWindow>(GlyphParams{p.x, p.y + p.height, p.width, p.height}, w)),
+    mMenuWindow(std::make_unique<MenuWindow>(GlyphParams{p.x, p.y + p.height, p.width, p.height}, w)),
     m_title(title)
 {}
 
@@ -22,19 +61,21 @@ void Menu::Draw(Window* w)
         InitMenuWindow();
     }
 
-    w->SetForeground(kBlack);
-
+    DrawButton(w, m_params);
     w->DrawText(m_params, m_title, Alignment::kCenter);
-    w->DrawRectangle({m_params.x, m_params.y}, m_params.width, m_params.height);
 }
 
 void Menu::ProcessEvent(Gui::Window* w, const Event& event)
 {
     const auto& ev = event.GetEvent();
     if(ev == EventType::MouseButtonPressed) {
-        mMenuWindow->ShowWindow();
-    } else if(ev == EventType::MouseButtonReleased) {
-        mMenuWindow->HideWindow();
+        if(mMenuWindow->IsVisible()) {
+            DrawButton(w, m_params);
+            mMenuWindow->HideWindow();
+        } else {
+            DrawPressedButton(w, m_params);
+            mMenuWindow->ShowWindow();
+        }
     }
 }
 

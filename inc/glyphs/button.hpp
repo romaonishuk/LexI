@@ -15,9 +15,6 @@ public:
     void Draw(Gui::Window*) override;
     void Add(GlyphPtr) override {}
 
-    void OnButtonPressed(Gui::Window*);
-    void OnButtonReleased(Gui::Window*);
-
     void ProcessEvent(Gui::Window* w, const Event& event) override;
 
     [[nodiscard]] bool IsPressed() const { return m_isPressed; }

@@ -23,7 +23,7 @@ public:
     void SetOnFocusedAction(std::function<void()>&&);
     void SetOnButtonPressedAction(std::function<void()>&&);
 
-    const std::string& GetText() const { return m_text; }
+    [[nodiscard]] const std::string& GetText() const { return m_text; }
 
 private:
     std::unique_ptr<ICommand> m_command;

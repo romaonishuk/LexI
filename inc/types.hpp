@@ -16,6 +16,7 @@ enum Color
 {
     kBlack = 0x0,
     kGray = 0xC0C0C0,
+    kLightGray = 0xD3D3D3,
     kWhite = 0xFFFFFF,
     kBlue = 0x0000FF,
     kLightBlue = 0xD6EBFF

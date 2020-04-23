@@ -19,7 +19,9 @@ public:
     }
     void MoveCursor(Gui::Window* newWindow, const GlyphParams& newParams);
     void Draw(Gui::Window* w);
-    Point GetPosition() const { return {m_params.x, m_params.y}; }
+    [[nodiscard]] Gui::Window* GetCurrentWindow() const { return m_currentWindow; }
+    [[nodiscard]] Point GetPosition() const { return {m_params.x, m_params.y}; }
+    bool IsActive() {return true;}
     // TODO(rmn): fixfix
     height_t GetCursorEnd() const { return m_params.y + m_params.height; }
 
@@ -31,6 +33,7 @@ private:
 
     Gui::Window* m_currentWindow = nullptr;
     GlyphParams m_params;
+
     //    bool stopThread = false;
     //    std::thread m_t;
 };

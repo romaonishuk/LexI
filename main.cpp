@@ -37,7 +37,7 @@ int main()
 
     Lexi::FontManager::Get().Init(&window);
 
-    const auto defaultFont = "clean";
+    const auto defaultFont = "clean"; //"Ubuntu Mono";
     Lexi::FontManager::Get().SetFont(defaultFont);
 
     auto top_panel =
@@ -55,16 +55,16 @@ int main()
     top_panel->Add(std::make_shared<Button>(GlyphParams{95, 5, 80, 40}, "Edit"));
     top_panel->Add(std::make_shared<Button>(GlyphParams{275, 5, 80, 40}, "Symbol"));
 
-    auto fontsMenu = std::make_shared<Gui::Menu>(GlyphParams{185, 5, 80, 40}, "Fonts", &window);
-    top_panel->Add(fontsMenu);
-    eventManager.addWindow(fontsMenu->getMenuWindow());
-
     auto text_view = std::make_shared<TextView>(GlyphParams{360, 100, 1200, 800}, &window);
     window.Add(text_view);
     eventManager.addWindow(text_view.get());
 
     auto scroll_board = std::make_shared<Scroller>(GlyphParams{1895, 100, 20, 800}, text_view);
     window.Add(scroll_board);
+
+    auto fontsMenu = std::make_shared<Gui::Menu>(GlyphParams{185, 5, 80, 40}, "Fonts", &window);
+    top_panel->Add(fontsMenu);
+    eventManager.addWindow(fontsMenu->getMenuWindow());
 
     auto fontSizeMenu = std::make_shared<Gui::DropDownMenu>(GlyphParams{365, 10, 80, 20}, "12", &window);
     top_panel->Add(fontSizeMenu);
