@@ -14,7 +14,12 @@ Button::Button(GlyphParams params, const std::string& text): IGlyph(params)
 
 void Button::Draw(Gui::Window* w)
 {
-    DrawButton(w, m_params);
+    if(m_isPressed){
+        DrawPressedButton(w, m_params);
+    } else {
+        DrawButton(w, m_params);
+    }
+
     w->DrawText(m_params, m_text, Alignment::kCenter);
 }
 

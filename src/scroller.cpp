@@ -48,7 +48,6 @@ void Scroller::ProcessEvent(Gui::Window* w, const Event& event)
         auto buttonParams = m_scrollButton->GetGlyphParams();
 
         if(scrollEvent->GetDirection() == Lexi::ScrollEvent::Direction::kUp) {
-            std::cout << "up: " << buttonParams.y << std::endl;
             if(buttonParams.y == m_params.y) {
                 return;
             }

@@ -32,7 +32,7 @@ void Window::Draw(Gui::Window* window)
 void Window::ReDraw(Gui::Window*)
 {
     m_window_impl->ClearWindow();
-    Gui::Window::Draw(this);
+    Draw(this);
 }
 
 void Window::ProcessEvent(Gui::Window* w, const Event& event)

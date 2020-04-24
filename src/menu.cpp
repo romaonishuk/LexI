@@ -39,7 +39,7 @@ void MenuWindow::ProcessEvent(Gui::Window* w, const Event& event)
 
                 m_currentMenuItem->ReDraw(this);
             }
-            std::cout << "Eve:"  << event.GetPoint().y << std::endl;
+
             SetCurrentMenuItem(it);
             return it->ProcessEvent(w, event);
         }

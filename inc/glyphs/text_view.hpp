@@ -11,7 +11,7 @@
 
 class Page;
 
-const auto pageHeight = 400;
+const auto pageHeight = 1000;
 const auto pageDelimer = 20;
 
 class TextView: public Gui::Window

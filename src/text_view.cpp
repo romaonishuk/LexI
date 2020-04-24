@@ -17,13 +17,14 @@ TextView::TextView(const GlyphParams& params, Gui::Window* w):
     m_currentPage = std::make_shared<Page>(this, GlyphParams{0, 0, m_params.width - 1, pageHeight});
     ICompositeGlyph::Add(m_currentPage);
     m_visiblePages.push_back(m_currentPage);
-    this->ShowWindow();
+    m_isVisible = false;
 }
 
 void TextView::Draw(Gui::Window* window)
 {
-    FillRectangle(m_params, Color::kGray);
-
+    if(!m_isVisible) {
+        this->ShowWindow();
+    }
     for(auto& page: m_visiblePages) {
         page->Draw(this);
         // Draw page separator
@@ -98,7 +99,8 @@ void TextView::UpdateVisiblePages()
 {
     m_visiblePages.clear();
     for(auto& it: m_components) {
-        if(m_visibleArea.IsIntersects(it->GetGlyphParams())) {
+        auto& pageParams = it->GetGlyphParams();
+        if(m_visibleArea.IsIntersects(pageParams) || pageParams.IsIntersects(m_visibleArea)) {
             m_visiblePages.push_back(it);
         }
     }
@@ -117,7 +119,7 @@ void TextView::UpdateVisibleArea(Gui::Window* window)
         }
 
         UpdateVisiblePages();
-        IGlyph::ReDraw(window);
+        ReDraw(window);
         m_onVisibleAreaUpdate();
     }
 
@@ -129,18 +131,17 @@ void TextView::UpdateVisibleArea(Gui::Window* window)
         }
 
         UpdateVisiblePages();
-        IGlyph::ReDraw(window);
+        ReDraw(window);
         m_onVisibleAreaUpdate();
     }
 }
 
 void TextView::UpdateVisibleArea(height_t h)
 {
-    std::cout << "Visible Area: " << h << " Overall: " << GetOverallHeight() << std::endl;
     m_visibleArea.y = h;
+
     UpdateVisiblePages();  // TODO(rmn): fix
-//    ClearArea(m_params);
-    Draw(this);
+    ReDraw(this);
 }
 
 std::shared_ptr<Page> TextView::SwitchPage(Gui::Window* window, SwitchDirection direction, bool createIfNotExists)
