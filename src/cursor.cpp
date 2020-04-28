@@ -33,7 +33,6 @@ void Cursor::MoveCursor(Gui::Window* newWindow, const GlyphParams& newParams)
 
     m_currentWindow = newWindow;
     m_params = newParams;
-    m_params.y -= m_params.height;
     DrawCursor(true);
 }
 

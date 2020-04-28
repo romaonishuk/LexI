@@ -11,6 +11,11 @@
 #include "row.hpp"
 #include "text_view.hpp"
 
+height_t Page::m_topIndent = 50;
+height_t Page::m_botIndent = 25;
+width_t Page::m_leftIndent = 50;
+width_t Page::m_rightIndent = 75;
+
 Page::Page(TextView* parent, const GlyphParams& params): ICompositeGlyph(params), m_parent(parent)
 {
     m_currentRow = std::make_shared<Row>(
@@ -39,11 +44,8 @@ void Page::ProcessEvent(Gui::Window* window, const Event& event)
     const auto* key = static_cast<const Lexi::KeyBoardEvent*>(&event);
 
     if(key->IsString()) {
-        if(!m_currentRow->IsFull()) {
-            m_currentRow->AddCharacter(window, key->m_key);
-        } else {
-            // TODO(rmn): add new row. and add character
-        }
+        m_currentRow->AddCharacter(window, key->m_key);
+        return;
     }
 
     switch(static_cast<Lexi::Key>(key->m_key)) {

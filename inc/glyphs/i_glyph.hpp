@@ -55,12 +55,20 @@ public:
         m_params.x = p.x;
         m_params.y = p.y;
     }
+
+    void SetPosition(width_t x, height_t y)
+    {
+        m_params.x = x;
+        m_params.y = y;
+    }
+
     void SetGlyphParams(const GlyphParams& params) { m_params = params; }
     const GlyphParams& GetGlyphParams() const { return m_params; }
     width_t GetWidth() const { return m_params.width; }
     height_t GetHeight() const { return m_params.height; }
     Point GetPosition() const { return {m_params.x, m_params.y}; }
-    height_t GetBottomPosition() const { return m_params.y + m_params.height; }
+    [[nodiscard]] height_t GetBottomBorder() const noexcept { return m_params.y + m_params.height; }
+    [[nodiscard]] height_t GetRightBorder() const noexcept { return m_params.x + m_params.width; }
 
 protected:
     GlyphParams m_params;

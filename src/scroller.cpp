@@ -57,14 +57,14 @@ void Scroller::ProcessEvent(Gui::Window* w, const Event& event)
                 buttonParams.y = m_params.y;
             }
         } else {
-            if(m_scrollButton->GetBottomPosition() == GetBottomPosition()) {
+            if(m_scrollButton->GetBottomBorder() == GetBottomBorder()) {
                 return;
             }
 
             // roll less than 15 px
             buttonParams.y += scrollEvent->GetScrolledDistance();
-            if(buttonParams.y + buttonParams.height > GetBottomPosition()) {
-                buttonParams.y = GetBottomPosition() - buttonParams.height;
+            if(buttonParams.y + buttonParams.height > GetBottomBorder()) {
+                buttonParams.y = GetBottomBorder() - buttonParams.height;
             }
         }
 

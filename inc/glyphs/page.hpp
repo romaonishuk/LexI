@@ -22,10 +22,10 @@ public:
 
 private:
     // text view indentations
-    const height_t m_topIndent = 25;
-    const height_t m_botIndent = 25;
-    const width_t m_leftIndent = 50;
-    const width_t m_rightIndent = 75;
+    static height_t m_topIndent;
+    static height_t m_botIndent;
+    static width_t m_leftIndent;
+    static width_t m_rightIndent;
 
     std::shared_ptr<Row> m_currentRow;
     TextView* m_parent;
