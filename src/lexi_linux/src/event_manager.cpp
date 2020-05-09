@@ -2,17 +2,17 @@
 // Created by romaonishuk on 24.02.20.
 //
 
+#include "event_manager.hpp"
+
 #include <X11/XKBlib.h>
 #include <X11/Xlib.h>
 
 #include <algorithm>
-#include "event_manager.hpp"
+#include <iostream>
 
 #include "cursor.hpp"
 #include "lexi_linux/inc/x_window_impl.hpp"
 #include "window.hpp"
-
-#include <iostream>
 
 EventManager::EventManager(Gui::Window* w): m_mainWindow(w), m_currentWindow(nullptr)
 {}
@@ -77,10 +77,10 @@ void EventManager::RunLoop()
                     case Button3:
                         break;
                     case Button4:
-                        m_currentWindow->ProcessEvent(m_currentWindow, ScrollEvent{p, ScrollEvent::Direction::kUp});
+                        ProcessCursorRelatedEvent(ScrollEvent{p, ScrollEvent::Direction::kUp});
                         break;
                     case Button5:
-                        m_currentWindow->ProcessEvent(m_currentWindow, ScrollEvent{p, ScrollEvent::Direction::kDown});
+                        ProcessCursorRelatedEvent(ScrollEvent{p, ScrollEvent::Direction::kDown});
                         break;
                     default:
                         break;
@@ -111,17 +111,7 @@ void EventManager::RunLoop()
                 if(key == NoSymbol) {
                     std::cout << "Wrong Key:" << std::endl;
                 } else {
-                    // If cursor is active redirect key press action to it
-                    auto& cursor = Lexi::Cursor::Get();
-                    if(cursor.IsActive()) {
-                        auto* w = cursor.GetCurrentWindow();
-                        assert(w);
-
-                        w->ProcessEvent(w, Lexi::KeyBoardEvent(Lexi::Cursor::Get().GetPosition(), key));
-                    } else {
-                        m_currentWindow->ProcessEvent(
-                            m_currentWindow, Lexi::KeyBoardEvent(Lexi::Cursor::Get().GetPosition(), key));
-                    }
+                    ProcessCursorRelatedEvent(Lexi::KeyBoardEvent(Lexi::Cursor::Get().GetPosition(), key));
                 }
             } break;
             case KeyRelease:
@@ -134,6 +124,20 @@ void EventManager::RunLoop()
                 std::cout << "RMN unprocessed event:" << event.type << std::endl;
                 break;
         }
+    }
+}
+
+void EventManager::ProcessCursorRelatedEvent(const Lexi::Event& event)
+{
+    // If cursor is active redirect key press action to it
+    auto& cursor = Lexi::Cursor::Get();
+    if(cursor.IsActive()) {
+        auto* cursorWindow = cursor.GetCurrentWindow();
+        assert(cursorWindow);
+
+        cursorWindow->ProcessEvent(cursorWindow, event);
+    } else {
+        m_currentWindow->ProcessEvent(m_currentWindow, event);
     }
 }
 

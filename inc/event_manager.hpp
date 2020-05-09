@@ -11,6 +11,8 @@
 #include <queue>
 #include <thread>
 
+#include "events.hpp"
+
 namespace Gui {
 class Window;
 }
@@ -25,6 +27,8 @@ public:
     void addWindow(Gui::Window* w) { childWindows.push_back(w); }
 
 private:
+    void ProcessCursorRelatedEvent(const Lexi::Event&);
+
     //    std::queue<std::unique_ptr<IEvent>> m_queue;
     std::vector<Gui::Window*> childWindows;
     Gui::Window* m_mainWindow;

@@ -37,7 +37,7 @@ int main()
 
     Lexi::FontManager::Get().Init(&window);
 
-    const auto defaultFont = "clean"; //"Ubuntu Mono";
+    const auto defaultFont = "clean";  //"Ubuntu Mono";
     Lexi::FontManager::Get().SetFont(defaultFont);
 
     auto top_panel =
@@ -71,8 +71,8 @@ int main()
     eventManager.addWindow(fontSizeMenu->getMenuWindow());
 
     auto bottom_panel =
-        std::make_shared<BorderDecorator>(GlyphParams{0, 925, initial_window_params.width, 20}, Color::kBlack);
-    auto status_line = std::make_shared<TextLabel>(GlyphParams{10, 940, 100, 20}, Version);
+        std::make_shared<BorderDecorator>(GlyphParams{0, 940, initial_window_params.width, 20}, Color::kBlack);
+    auto status_line = std::make_shared<TextLabel>(GlyphParams{10, 955, 100, 20}, Version);
     bottom_panel->Add(status_line);
     window.Add(bottom_panel);
 
@@ -112,7 +112,9 @@ int main()
         scroll_board->UpdateScrollerPosition(&window);
     });
 
+    // TODO(rmn): think about textView/ScrollBar dependency!
     text_view->SetOnVisibleAreaUpdateAction([&] { scroll_board->UpdateScrollerPosition(&window); });
+    text_view->SetOnScrollAction([&](const Lexi::Event& event) { scroll_board->ProcessEvent(&window, event); });
 
     eventManager.RunLoop();
 }

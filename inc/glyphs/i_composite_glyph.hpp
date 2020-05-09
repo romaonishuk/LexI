@@ -13,6 +13,8 @@
 class ICompositeGlyph: public IGlyph
 {
 public:
+    using GlyphList = std::list<GlyphPtr>;
+
     explicit ICompositeGlyph(const GlyphParams params): IGlyph(params) {}
 
     void Draw(Gui::Window* window) override
@@ -59,7 +61,7 @@ public:
     //    void Remove();
 
 protected:
-    std::list<GlyphPtr> m_components;
+    GlyphList m_components;
 };
 
 #endif  // LEXI_I_COMPOSITE_GLYPH_HPP
