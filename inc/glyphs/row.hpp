@@ -7,42 +7,41 @@
 
 #include "i_composite_glyph.hpp"
 
+#include <optional>
+
 class TextView;
-
-// TODO(rmn): optimize
-class Character: public IGlyph
-{
-public:
-    Character(const GlyphParams& params, char c): IGlyph(params), m_symbol(c) {}
-    void Draw(Gui::Window* window) override;
-    void DrawAt(Gui::Window*, const Point& point) override;
-    void ProcessEvent(Gui::Window* w, const Event& event) override {}
-
-private:
-    char m_symbol;
-};
+class Character;
 
 class Row: public ICompositeGlyph
 {
 public:
     explicit Row(const GlyphParams& params);
 
-    void AddCharacter(Gui::Window* w, char c);
-
+    void ProcessEvent(Gui::Window* w, const Event& event) override;
     void Draw(Gui::Window* window) override;
     void DrawCursor(Gui::Window* window);
-    //    void DrawCursorLeft(Gui::Window* window);
-    //    void DrawCursorRight(Gui::Window* window);
+    void DrawCursorAtEnd(Gui::Window* window);
+    void ReDraw(Gui::Window* window) override;
 
-    bool IsEmpty() const { return m_components.empty(); }
-    bool IsFull() const;
+    std::optional<std::shared_ptr<IGlyph>> AddCharacter(Gui::Window* w, char c);
+    void Remove(Gui::Window* window, const GlyphPtr& ptr);
+    GlyphList Cut(size_t startPosition, size_t pixelsCount);
 
-    GlyphPtr GetLast() const;
+    using ICompositeGlyph::Insert;
+    std::optional<GlyphList> Insert(std::shared_ptr<Row>& row);
+    std::optional<GlyphList> Insert(size_t insertPosition, std::list<GlyphPtr>&&);
 
-    void ProcessEvent(Gui::Window* w, const Event& event) override;
-    void Remove(Gui::Window* w, const GlyphPtr& ptr);
+    [[nodiscard]] bool IsEmpty() const { return m_components.empty(); }
+    [[nodiscard]] bool IsFull() const;
+    [[nodiscard]] width_t GetFreeSpace() const { return m_params.width - m_usedWidth; }
+    [[nodiscard]] width_t GetUsedSpace() const { return m_usedWidth; }
+    [[nodiscard]] std::shared_ptr<Character> GetFirstChar() const;
+    [[nodiscard]] std::shared_ptr<Character> GetLastChar() const;
 
 private:
+    void Remove(Gui::Window* window, GlyphList::iterator& it);
+    void UpdateRestElements(GlyphList::iterator& it, const int updateValue);
+
     width_t m_usedWidth = 0;
 };
 

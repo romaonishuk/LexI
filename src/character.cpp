@@ -22,9 +22,3 @@ void Character::DrawAt(Gui::Window* window, const Point& point)
     window->SetForeground(kBlack);
     window->DrawText({point.x, point.y + Lexi::FontManager::Get().GetCharAscent()}, {m_symbol});
 }
-
-void Character::DrawCursor(Gui::Window* window)
-{
-    auto cursorWidth = 1;
-    Lexi::Cursor::Get().MoveCursor(window, {GetRightBorder(), m_params.y, cursorWidth, m_params.height});
-}

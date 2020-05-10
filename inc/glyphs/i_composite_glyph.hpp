@@ -59,6 +59,15 @@ public:
     void Add(GlyphPtr glyph) override { m_components.push_back(std::move(glyph)); }
 
     //    void Remove();
+    GlyphPtr Find(const Point& point)
+    {
+        for(auto& it: m_components) {
+            if(it->Intersects(point)) {
+                return it;
+            }
+        }
+        return nullptr;
+    }
 
 protected:
     GlyphList m_components;

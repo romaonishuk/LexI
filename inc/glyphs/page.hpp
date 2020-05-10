@@ -20,7 +20,14 @@ public:
 
     void DrawCursor(Gui::Window* window);
 
+    [[nodiscard]] bool IsLastRow(const GlyphPtr&) const;
+
 private:
+    void ProcessBackspace(Gui::Window*);
+
+    std::shared_ptr<Row> GetPreviousRow();
+    std::shared_ptr<Row> GetNextRow();
+
     // text view indentations
     static height_t m_topIndent;
     static height_t m_botIndent;

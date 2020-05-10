@@ -7,7 +7,7 @@
 #include "types.hpp"
 #include "window.hpp"
 
-void IGlyph::ClearGlyph(Gui::Window *w)
+void IGlyph::ClearGlyph(Gui::Window* w)
 {
     w->ClearArea(m_params);
 }

@@ -15,7 +15,6 @@ public:
     void Draw(Gui::Window* window) override;
     void DrawAt(Gui::Window*, const Point& point) override;
     void ProcessEvent(Gui::Window* w, const Event& event) override {}
-    void DrawCursor(Gui::Window* w);
 
     void SetChar(char c) { m_symbol = c; }
     [[nodiscard]] char GetChar() const { return m_symbol; }

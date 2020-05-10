@@ -14,6 +14,7 @@ TextView::TextView(const GlyphParams& params, Gui::Window* w):
     Gui::Window(params, w),
     m_visibleArea(0, 0, params.width, params.height)
 {
+    SetForeground(Color::kWhite);
     m_currentPage = std::make_shared<Page>(this, GlyphParams{0, 0, m_params.width - 1, pageHeight});
     ICompositeGlyph::Add(m_currentPage);
     m_visiblePages.push_back(m_currentPage);
@@ -30,7 +31,7 @@ void TextView::Draw(Gui::Window* window)
         // Draw page separator
         auto separatorParams = page->GetGlyphParams();
         separatorParams.y = separatorParams.y + separatorParams.height + 1;
-        separatorParams.height = pageDelimer - 1;
+        separatorParams.height = pageSeparator - 1;
         FillRectangle(separatorParams, Color::kGray);
     }
 
@@ -44,6 +45,9 @@ void TextView::ProcessEvent(Gui::Window* window, const Event& event)
         UpdateVisibleArea(window);
 
         return;
+    } else if(event.GetEvent() == EventType::Scroll) {
+        assert(m_onScroll);
+        m_onScroll(event);
     }
 }
 
@@ -81,7 +85,7 @@ std::shared_ptr<Page> TextView::AddPage(const GlyphPtr& currentPage)
 
     if(currentPage == m_components.back()) {
         auto newPageParams = currentPage->GetGlyphParams();
-        newPageParams.y = newPageParams.y + newPageParams.height + pageDelimer;
+        newPageParams.y = newPageParams.y + newPageParams.height + pageSeparator;
 
         auto newPage = std::make_shared<Page>(this, newPageParams);
         m_components.push_back(newPage);

@@ -38,10 +38,11 @@ public:
     [[nodiscard]] uint32_t GetPageCount() const { return m_components.size(); }
     [[nodiscard]] uint32_t GetPageHeight() const { return pageHeight; }
     [[nodiscard]] GlyphParams GetVisibleArea() const { return m_visibleArea; }
-    [[nodiscard]] uint32_t GetOverallHeight() const { return m_components.size() * (pageHeight + pageDelimer); }
+    [[nodiscard]] uint32_t GetOverallHeight() const { return m_components.size() * (pageHeight + pageSeparator); }
 
     void SetOnPageAddedAction(std::function<void()>&& action) { m_onPageAdded = std::move(action); }
     void SetOnVisibleAreaUpdateAction(std::function<void()>&& action) { m_onVisibleAreaUpdate = std::move(action); }
+    void SetOnScrollAction(std::function<void(const Lexi::Event&)>&& action) { m_onScroll = std::move(action); }
 
     std::shared_ptr<Page> SwitchPage(Gui::Window*, SwitchDirection, bool);
     std::shared_ptr<Page> AddPage(const GlyphPtr& currentPage);
@@ -60,6 +61,7 @@ private:
 
     std::function<void()> m_onPageAdded;
     std::function<void()> m_onVisibleAreaUpdate;
+    std::function<void(const Lexi::Event&)> m_onScroll;
     //    std::function<void> m_onPageRemoved;
 };
 
