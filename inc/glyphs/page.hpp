@@ -24,6 +24,7 @@ public:
 
 private:
     void ProcessBackspace(Gui::Window*);
+    void ProcessCharacterShift(std::shared_ptr<Row>&, IGlyph::GlyphPtr&);
 
     std::shared_ptr<Row> GetPreviousRow();
     std::shared_ptr<Row> GetNextRow();

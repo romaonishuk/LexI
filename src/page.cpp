@@ -39,10 +39,41 @@ void Page::DrawCursor(Gui::Window* window)
     m_currentRow->DrawCursor(window);
 }
 
-// void Page::UpdateContent()
-//{
-//
-//}
+void Page::ProcessCharacterShift(std::shared_ptr<Row>& row, IGlyph::GlyphPtr& newChar)
+{
+    auto& cursor = Lexi::Cursor::Get();
+    bool moveCursor = false;
+    // last char
+    if(newChar->GetRightBorder() == cursor.GetPosition().x) {
+        moveCursor = true;
+    }
+
+    std::shared_ptr<Row> nextRow;
+    if(m_currentRow == m_components.back()) {
+        if(IsLastRow(m_currentRow)) {
+            // TODO(rmn): add new row
+        } else {
+            nextRow = std::make_shared<Row>(
+                GlyphParams{m_leftIndent, m_currentRow->GetPosition().y + Lexi::FontManager::Get().GetCharHeight(),
+                    m_params.width - m_leftIndent - m_rightIndent, Lexi::FontManager::Get().GetCharHeight()});
+            ICompositeGlyph::Add(nextRow);
+        }
+    } else {
+        nextRow = GetNextRow();
+    }
+
+    auto res = nextRow->AddCharacter(nextRow->GetPosition(), newChar);
+    if(moveCursor) {
+        m_currentRow = nextRow;
+        auto newParams = newChar->GetGlyphParams();
+        newParams.x = newChar->GetRightBorder();
+        cursor.MoveCursor(cursor.GetCurrentWindow(), newParams);
+    }
+
+    if(res) {
+        ProcessCharacterShift(nextRow, *res);
+    }
+}
 
 void Page::ProcessEvent(Gui::Window* window, const Event& event)
 {
@@ -51,34 +82,17 @@ void Page::ProcessEvent(Gui::Window* window, const Event& event)
     auto& cursor = Lexi::Cursor::Get();
 
     if(key->IsString()) {
-        auto res = m_currentRow->AddCharacter(window, key->m_key);
-        if(res) {
-            auto c = std::static_pointer_cast<Character>(*res)->GetChar();
-            auto newEvent = Lexi::KeyBoardEvent(event.GetPoint(), c);
-            if(m_currentRow == m_components.back()) {
-                if(IsLastRow(m_currentRow)) {
-                    auto nextPage = m_parent->SwitchPage(window, TextView::SwitchDirection::kNext, true);
-                    nextPage->ProcessEvent(window, newEvent);
-                } else {
-                    m_currentRow = std::make_shared<Row>(GlyphParams{m_leftIndent,
-                        m_currentRow->GetPosition().y + Lexi::FontManager::Get().GetCharHeight(),
-                        m_params.width - m_leftIndent - m_rightIndent, Lexi::FontManager::Get().GetCharHeight()});
-                    ICompositeGlyph::Add(m_currentRow);
-                    ProcessEvent(window, newEvent);
-                }
-            } else {
-                m_currentRow = GetNextRow();
-                cursor.MoveCursor(window, m_currentRow->GetGlyphParams());
-                ProcessEvent(window, newEvent);
-            }
+        // new character add caused removing of last char from row
+        if(auto res = m_currentRow->AddCharacter(key->m_key)) {
+            ProcessCharacterShift(m_currentRow, *res);
+            return;
         }
-        return;
     }
 
     switch(static_cast<Lexi::Key>(key->m_key)) {
         case Lexi::Key::kEnter: {
             auto fontHeight = Lexi::FontManager::Get().GetCharHeight();
-            if(m_currentRow->GetPosition().y + fontHeight < m_params.y + m_params.height - m_botIndent) {
+            if(!IsLastRow(m_currentRow)) {
                 m_currentRow = std::make_shared<Row>(
                     GlyphParams{m_params.x + m_leftIndent, m_currentRow->GetPosition().y + fontHeight,
                         m_params.width - m_leftIndent - m_rightIndent, fontHeight});
@@ -106,7 +120,7 @@ void Page::ProcessEvent(Gui::Window* window, const Event& event)
             }
         } break;
         case Lexi::Key::kArrowLeft: {
-            if(Lexi::Cursor::Get().GetPosition().x == m_currentRow->GetPosition().x) {
+            if(cursor.GetPosition().x == m_currentRow->GetPosition().x) {
                 // switch page
                 if(m_currentRow == m_components.front()) {
                 } else {  // move cursor to previous row
@@ -119,13 +133,12 @@ void Page::ProcessEvent(Gui::Window* window, const Event& event)
         } break;
         case Lexi::Key::kArrowRight: {
             auto lastChar = m_currentRow->GetLastChar();
-            if((lastChar && lastChar->GetRightBorder() == Lexi::Cursor::Get().GetPosition().x) ||
-                m_currentRow->IsEmpty()) {
+            if((lastChar && lastChar->GetRightBorder() == cursor.GetPosition().x) || m_currentRow->IsEmpty()) {
                 if(m_currentRow == m_components.back()) {
                     // switch page
                 } else {
                     m_currentRow = GetNextRow();
-                    Lexi::Cursor::Get().MoveCursor(window, m_currentRow->GetGlyphParams());
+                    cursor.MoveCursor(window, m_currentRow->GetGlyphParams());
                 }
             } else {
                 m_currentRow->ProcessEvent(window, event);
@@ -145,7 +158,7 @@ void Page::ProcessEvent(Gui::Window* window, const Event& event)
 
 bool Page::IsLastRow(const GlyphPtr& row) const
 {
-    return m_currentRow->GetBottomBorder() + Lexi::FontManager::Get().GetCharHeight() >
+    return row->GetBottomBorder() + Lexi::FontManager::Get().GetCharHeight() >
         m_params.y + m_params.height - m_botIndent;
 }
 

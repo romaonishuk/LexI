@@ -23,7 +23,10 @@ public:
     void DrawCursorAtEnd(Gui::Window* window);
     void ReDraw(Gui::Window* window) override;
 
-    std::optional<std::shared_ptr<IGlyph>> AddCharacter(Gui::Window* w, char c);
+    std::optional<GlyphPtr> AddCharacter(char c);
+    std::optional<GlyphPtr> AddCharacter(const Point& position, IGlyph::GlyphPtr newChar);
+    GlyphPtr InsertChar(Gui::Window* window, std::shared_ptr<Character> &newChar, const Point& p);
+
     void Remove(Gui::Window* window, const GlyphPtr& ptr);
     GlyphList Cut(size_t startPosition, size_t pixelsCount);
 
@@ -40,6 +43,7 @@ public:
 
 private:
     void Remove(Gui::Window* window, GlyphList::iterator& it);
+    IGlyph::GlyphPtr RemoveRedundantCharacter();
     void UpdateRestElements(GlyphList::iterator& it, const int updateValue);
 
     width_t m_usedWidth = 0;

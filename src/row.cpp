@@ -64,7 +64,7 @@ void Row::DrawCursorAtEnd(Gui::Window* window)
     if(lastChar) {
         pos = lastChar->GetRightBorder();
     }
-    Lexi::Cursor::Get().MoveCursor(window, {pos, m_params.y, cursorWidth, m_params.height});
+    cursor.MoveCursor(window, {pos, m_params.y, cursorWidth, m_params.height});
 }
 
 void Row::ProcessEvent(Gui::Window* window, const Event& event)
@@ -125,36 +125,34 @@ void Row::UpdateRestElements(GlyphList::iterator& it, const int updateValue)
     }
 }
 
-std::optional<std::shared_ptr<IGlyph>> Row::AddCharacter(Gui::Window* w, char c)
+IGlyph::GlyphPtr Row::InsertChar(Gui::Window* window, std::shared_ptr<Character>& newChar, const Point& position)
 {
-    const auto& fontManager = Lexi::FontManager::Get();
-    const auto charWidth = fontManager.GetCharWidth();
-    const auto charHeight = fontManager.GetCharHeight();
+    const auto& charWidth = newChar->GetWidth();
 
-    // TODO(rmn): move
-    auto newChar = std::make_shared<Character>(GlyphParams{m_params.x, m_params.y, charWidth, charHeight}, c);
     if(m_components.empty()) {
         Add(newChar);
-        newChar->Draw(w);
-        cursor.MoveCursor(w, {newChar->GetRightBorder(), m_params.y, cursorWidth, m_params.height});
+        newChar->Draw(window);
         m_usedWidth += (charWidth + 1);
-        return std::nullopt;
+        return nullptr;
     }
 
-    const auto& cursorPosition = cursor.GetPosition();
     auto& lastChar = m_components.back();
     // Add to end. No need to redraw other characters
-    if(lastChar->Intersects(cursorPosition)) {
-        newChar->SetPosition(lastChar->GetRightBorder() + 1, m_params.y);
-        Add(newChar);
-        newChar->Draw(w);
+    if(lastChar->Intersects(position)) {
+        if(IsFull()) {
+            return newChar;
+        } else {
+            newChar->SetPosition(lastChar->GetRightBorder() + 1, m_params.y);
+            Add(newChar);
+            newChar->Draw(window);
+        }
     } else {
-        if(cursorPosition.x == m_params.x) {
+        if(position.x == m_params.x) {
             m_components.push_front(newChar);
             UpdateRestElements(++m_components.begin(), static_cast<int>(charWidth + 1));
         } else {
             auto it = std::find_if(m_components.begin(), m_components.end(),
-                [&](const auto& element) { return element->Intersects(cursorPosition); });
+                [&](const auto& element) { return element->Intersects(position); });
 
             assert(it != m_components.end());
 
@@ -162,19 +160,43 @@ std::optional<std::shared_ptr<IGlyph>> Row::AddCharacter(Gui::Window* w, char c)
             m_components.insert(++it, newChar);
             UpdateRestElements(it, static_cast<int>(charWidth + 1));
         }
-        ReDraw(w);
+
+        m_usedWidth += (charWidth + 1);
+        auto res = RemoveRedundantCharacter();
+        ReDraw(window);
+        return res;
     }
 
-    cursor.MoveCursor(w, {newChar->GetRightBorder(), m_params.y, cursorWidth, m_params.height});
     m_usedWidth += (charWidth + 1);
+    return nullptr;
+}
 
-    if(m_usedWidth > m_params.width) {
-        auto tmp = m_components.back();
-        m_usedWidth -= tmp->GetWidth() - 1;
-        m_components.pop_back();
-        return std::optional<std::shared_ptr<IGlyph>>(std::move(tmp));
+std::optional<IGlyph::GlyphPtr> Row::AddCharacter(char c)
+{
+    const auto& fontManager = Lexi::FontManager::Get();
+    const auto charWidth = fontManager.GetCharWidth();
+    const auto charHeight = fontManager.GetCharHeight();
+    auto* window = cursor.GetCurrentWindow();
+
+    // TODO(rmn): move
+    auto newChar = std::make_shared<Character>(GlyphParams{m_params.x, m_params.y, charWidth, charHeight}, c);
+    auto poppedElement = InsertChar(window, newChar, cursor.GetPosition());
+
+    cursor.MoveCursor(window, {newChar->GetRightBorder(), m_params.y, cursorWidth, m_params.height});
+    return poppedElement ? std::optional<GlyphPtr>(std::move(poppedElement)) : std::nullopt;
+}
+
+std::optional<IGlyph::GlyphPtr> Row::AddCharacter(const Point& position, IGlyph::GlyphPtr newChar)
+{
+    if(!Intersects(position)) {
+        return std::nullopt;
     }
-    return std::nullopt;
+
+    auto* window = cursor.GetCurrentWindow();
+    newChar->SetPosition(position);
+    auto c = std::static_pointer_cast<Character>(newChar);
+    auto poppedElement = InsertChar(window, c, position);
+    return poppedElement ? std::optional<GlyphPtr>(std::move(poppedElement)) : std::nullopt;
 }
 
 std::optional<ICompositeGlyph::GlyphList> Row::Insert(std::shared_ptr<Row>& row)
@@ -263,6 +285,17 @@ void Row::Remove(Gui::Window* window, ICompositeGlyph::GlyphList::iterator& it)
 
     cursor.MoveCursor(window, {newCursorPosition, m_params.y, cursorWidth, m_params.height});
     m_usedWidth -= charWidth;
+}
+
+IGlyph::GlyphPtr Row::RemoveRedundantCharacter()
+{
+    if(m_usedWidth > m_params.width) {
+        auto tmp = m_components.back();
+        m_usedWidth -= tmp->GetWidth() - 1;
+        m_components.pop_back();
+        return tmp;
+    }
+    return nullptr;
 }
 
 ICompositeGlyph::GlyphList Row::Cut(size_t startPosition, size_t pixelsCount)
