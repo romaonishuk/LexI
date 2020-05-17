@@ -79,7 +79,7 @@ void TextView::DrawLine(const Point& start_point, const Point& end_point) const
         {start_point.x, start_point.y - m_visibleArea.y}, {end_point.x, end_point.y - m_visibleArea.y});
 }
 
-std::shared_ptr<Page> TextView::AddPage(const GlyphPtr& currentPage)
+std::shared_ptr<Page> TextView::AddPage(Gui::Window* window, const GlyphPtr& currentPage)
 {
     assert(m_onPageAdded);
 
@@ -89,6 +89,9 @@ std::shared_ptr<Page> TextView::AddPage(const GlyphPtr& currentPage)
 
         auto newPage = std::make_shared<Page>(this, newPageParams);
         m_components.push_back(newPage);
+        newPage->Draw(window);
+        UpdateVisibleArea(window);
+        m_onPageAdded();
         return newPage;
     } else {
         //        auto it = std::find(m_components.cbegin(), m_components.cend(), currentPage);
@@ -96,6 +99,30 @@ std::shared_ptr<Page> TextView::AddPage(const GlyphPtr& currentPage)
         //            m_components.insert(it)
     }
     return m_currentPage;
+}
+
+// TODO(rmn): remove after full smart pointers move
+std::shared_ptr<Page> TextView::AddPage(Gui::Window* window, const Page* page)
+{
+    auto pageIt = std::find_if(m_components.begin(), m_components.end(), [&](const auto& elem){
+        return elem.get() == page;
+    });
+    assert(pageIt != m_components.end());
+    return  AddPage(window, *pageIt);
+}
+
+std::shared_ptr<Page> TextView::GetNextPage(const Page* page)
+{
+    auto nextPage = std::find_if(m_components.begin(), m_components.end(), [&](const auto& elem){
+        return elem.get() == page;
+    });
+    assert(nextPage != m_components.end());
+    nextPage++;
+    if(nextPage == m_components.end()) {
+        std::cout << "Given page is last!" << std::endl;
+        return nullptr;
+    }
+    return std::static_pointer_cast<Page>(*nextPage);
 }
 
 // TODO(rmn): optimize
@@ -155,10 +182,7 @@ std::shared_ptr<Page> TextView::SwitchPage(Gui::Window* window, SwitchDirection 
     if(direction == SwitchDirection::kNext) {
         if(m_currentPage == m_components.back()) {
             if(createIfNotExists) {
-                m_currentPage = AddPage(m_currentPage);
-                m_currentPage->Draw(window);
-                UpdateVisibleArea(window);
-                m_onPageAdded();
+                m_currentPage = AddPage(window, m_currentPage);
             } else {
                 return m_currentPage;
             }

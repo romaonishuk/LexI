@@ -42,19 +42,25 @@ void Page::DrawCursor(Gui::Window* window)
 void Page::ProcessCharacterShift(std::shared_ptr<Row>& row, IGlyph::GlyphPtr& newChar)
 {
     auto& cursor = Lexi::Cursor::Get();
-    bool moveCursor = false;
+    bool updateCursorLocation = false;
     // last char
     if(newChar->GetRightBorder() == cursor.GetPosition().x) {
-        moveCursor = true;
+        updateCursorLocation = true;
     }
 
     std::shared_ptr<Row> nextRow;
-    if(m_currentRow == m_components.back()) {
-        if(IsLastRow(m_currentRow)) {
-            // TODO(rmn): add new row
+    std::shared_ptr<Page> nextPage;
+    if(row == m_components.back()) {
+        if(IsLastRow(row)) {
+            nextPage = m_parent->GetNextPage(this);
+            if(!nextPage) {
+                nextPage = m_parent->AddPage(Lexi::Cursor::Get().GetCurrentWindow(), this);
+            }
+            nextRow = nextPage->GetFirstRow();
+            nextPage->SetCurrentRow(nextRow);
         } else {
             nextRow = std::make_shared<Row>(
-                GlyphParams{m_leftIndent, m_currentRow->GetPosition().y + Lexi::FontManager::Get().GetCharHeight(),
+                GlyphParams{m_leftIndent, row->GetPosition().y + Lexi::FontManager::Get().GetCharHeight(),
                     m_params.width - m_leftIndent - m_rightIndent, Lexi::FontManager::Get().GetCharHeight()});
             ICompositeGlyph::Add(nextRow);
         }
@@ -63,8 +69,13 @@ void Page::ProcessCharacterShift(std::shared_ptr<Row>& row, IGlyph::GlyphPtr& ne
     }
 
     auto res = nextRow->AddCharacter(nextRow->GetPosition(), newChar);
-    if(moveCursor) {
-        m_currentRow = nextRow;
+    if(updateCursorLocation) {
+        if(nextPage) {
+            m_parent->SetCurrentPage(nextPage);
+        } else {
+            m_currentRow = nextRow;
+        }
+
         auto newParams = newChar->GetGlyphParams();
         newParams.x = newChar->GetRightBorder();
         cursor.MoveCursor(cursor.GetCurrentWindow(), newParams);
@@ -156,6 +167,11 @@ void Page::ProcessEvent(Gui::Window* window, const Event& event)
     }
 }
 
+std::shared_ptr<Row> Page::GetFirstRow()
+{
+    return std::static_pointer_cast<Row>(m_components.front());
+}
+
 bool Page::IsLastRow(const GlyphPtr& row) const
 {
     return row->GetBottomBorder() + Lexi::FontManager::Get().GetCharHeight() >
@@ -168,12 +184,25 @@ std::shared_ptr<Row> Page::GetPreviousRow()
     return std::static_pointer_cast<Row>(*(std::prev(rowIt)));
 }
 
+std::shared_ptr<Row> Page::GetPreviousRow(IGlyph::GlyphPtr &row)
+{
+    auto rowIt = std::find(m_components.begin(), m_components.end(), row);
+    return std::static_pointer_cast<Row>(*(std::prev(rowIt)));
+}
+
 std::shared_ptr<Row> Page::GetNextRow()
 {
     auto rowIt = std::find(m_components.begin(), m_components.end(), m_currentRow);
     return std::static_pointer_cast<Row>(*std::next(rowIt));
 }
 
+std::shared_ptr<Row> Page::GetNextRow(IGlyph::GlyphPtr &row)
+{
+    auto rowIt = std::find(m_components.begin(), m_components.end(), row);
+    return std::static_pointer_cast<Row>(*std::next(rowIt));
+}
+
+// TODO(rmn): proper name
 void Page::ProcessBackspace(Gui::Window* window)
 {
     if(m_currentRow == m_components.front()) {

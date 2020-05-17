@@ -22,12 +22,17 @@ public:
 
     [[nodiscard]] bool IsLastRow(const GlyphPtr&) const;
 
+    std::shared_ptr<Row> GetFirstRow();
+    void SetCurrentRow(std::shared_ptr<Row> row){m_currentRow = std::move(row);}
+
 private:
     void ProcessBackspace(Gui::Window*);
     void ProcessCharacterShift(std::shared_ptr<Row>&, IGlyph::GlyphPtr&);
 
     std::shared_ptr<Row> GetPreviousRow();
+    std::shared_ptr<Row> GetPreviousRow(IGlyph::GlyphPtr &row);
     std::shared_ptr<Row> GetNextRow();
+    std::shared_ptr<Row> GetNextRow(IGlyph::GlyphPtr &row);
 
     // text view indentations
     static height_t m_topIndent;

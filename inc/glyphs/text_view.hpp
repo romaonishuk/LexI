@@ -35,6 +35,7 @@ public:
 
     [[nodiscard]] std::string GetWindowName() const override { return "Text View"; }
 
+    void SetCurrentPage(std::shared_ptr<Page> page) {m_currentPage = std::move(page);}
     [[nodiscard]] uint32_t GetPageCount() const { return m_components.size(); }
     [[nodiscard]] uint32_t GetPageHeight() const { return pageHeight; }
     [[nodiscard]] GlyphParams GetVisibleArea() const { return m_visibleArea; }
@@ -45,7 +46,9 @@ public:
     void SetOnScrollAction(std::function<void(const Lexi::Event&)>&& action) { m_onScroll = std::move(action); }
 
     std::shared_ptr<Page> SwitchPage(Gui::Window*, SwitchDirection, bool);
-    std::shared_ptr<Page> AddPage(const GlyphPtr& currentPage);
+    std::shared_ptr<Page> AddPage(Gui::Window* window, const GlyphPtr& currentPage);
+    std::shared_ptr<Page> AddPage(Gui::Window* window, const Page* page);
+    std::shared_ptr<Page> GetNextPage(const Page* page);
 
     void UpdateVisibleArea(height_t h);
     void UpdateVisibleArea(Gui::Window* window);
