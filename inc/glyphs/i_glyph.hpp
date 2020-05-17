@@ -20,6 +20,9 @@ class Window;
 using Lexi::Event;
 using Lexi::EventType;
 
+/**
+ * \brief  Base class for all graphical units in the project.
+ */
 class IGlyph
 {
 public:

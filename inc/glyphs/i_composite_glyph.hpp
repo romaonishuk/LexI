@@ -10,6 +10,12 @@
 
 #include "i_glyph.hpp"
 
+/**
+ * \brief  The class represents a complex glyph, i.e glyph that contains one or more glyphs.
+ *         Provides basic functionality to work with a list of IGlyphs.
+ *
+ * \attention  Implements Composite pattern.
+ */
 class ICompositeGlyph: public IGlyph
 {
 public:

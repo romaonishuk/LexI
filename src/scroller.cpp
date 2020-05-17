@@ -29,7 +29,7 @@ void Scroller::ProcessEvent(Gui::Window* w, const Event& event)
         auto& eventPosition = event.GetPoint();
         auto buttonParams = m_scrollButton->GetGlyphParams();
 
-        height_t delta = eventPosition.y - m_Previous.y;
+        height_t delta = eventPosition.y - m_previousPosition.y;
         buttonParams.y += delta;
         if(buttonParams.y < m_params.y || buttonParams.y + buttonParams.height > m_params.y + m_params.height) {
             return;
@@ -42,7 +42,7 @@ void Scroller::ProcessEvent(Gui::Window* w, const Event& event)
 
         // NOTE: since we assume that scrollBoard begin is equal TextView begin, we need  to subtract m_params.y
         m_view->UpdateVisibleArea((buttonParams.y - m_params.y) / m_scale);
-        m_Previous = event.GetPoint();
+        m_previousPosition = event.GetPoint();
     } else if(ev == Lexi::EventType::Scroll) {
         const auto* scrollEvent = static_cast<const Lexi::ScrollEvent*>(&event);
         auto buttonParams = m_scrollButton->GetGlyphParams();
@@ -77,7 +77,7 @@ void Scroller::ProcessEvent(Gui::Window* w, const Event& event)
         m_view->UpdateVisibleArea((buttonParams.y - m_params.y) / m_scale);
     } else if(m_scrollButton->Intersects(event.GetPoint())) {
         if(ev == Lexi::EventType::MouseButtonPressed) {
-            m_Previous = event.GetPoint();
+            m_previousPosition = event.GetPoint();
         }
         // TODO(rmn): thiiiiink
         m_scrollButton->ProcessEvent(w, event);

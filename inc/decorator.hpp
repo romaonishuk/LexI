@@ -5,12 +5,17 @@
 #ifndef LEXI_DECORATOR_HPP
 #define LEXI_DECORATOR_HPP
 
-#include "i_glyph.hpp"
+#include "i_composite_glyph.hpp"
 #include "window.hpp"
 
-// TODO(rmn):
-// - use array + templates to remove
+// TODO(rmn): try to use array + templates to remove
 
+/**
+ * \brief  Base class for all decorators.
+ *         Provide a wrapper for a given set of glyphs and redirects operations to them.
+ *
+ * \attention  Implements decorator pattern
+ */
 class IDecorator: public ICompositeGlyph
 {
 public:
@@ -19,6 +24,9 @@ public:
     // virtual void Draw() = 0;
 };
 
+/**
+ * \brief  Simple decorator, that draws a rectangle over a bordered glyphs.
+ */
 class BorderDecorator: public IDecorator
 {
 public:

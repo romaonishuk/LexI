@@ -31,7 +31,7 @@ private:
     // How much TextView pixels are in one scrollBoard pixel
     float m_scale;
     std::shared_ptr<Button> m_scrollButton;
-    Point m_Previous;  // TODO(rmn): rename!!!
+    Point m_previousPosition;
 };
 
 #endif  // LEXI_SCROLLER_HPP
