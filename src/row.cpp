@@ -201,7 +201,7 @@ std::optional<IGlyph::GlyphPtr> Row::AddCharacter(const Point& position, IGlyph:
 
 std::optional<ICompositeGlyph::GlyphList> Row::Insert(std::shared_ptr<Row>& row)
 {
-    auto position = m_components.back()->GetRightBorder();
+    auto position = m_components.empty() ? m_params.x : m_components.back()->GetRightBorder();
     auto tmpList = row->m_components;
     return Insert(position, std::move(tmpList));
 }

@@ -75,6 +75,13 @@ public:
         return nullptr;
     }
 
+    void MoveGlyph(width_t x, height_t y) override {
+        IGlyph::MoveGlyph(x, y);
+        for(auto&it: m_components) {
+            it->MoveGlyph(x, y);
+        }
+    }
+
 protected:
     GlyphList m_components;
 };

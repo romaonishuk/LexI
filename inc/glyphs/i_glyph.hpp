@@ -65,6 +65,15 @@ public:
         m_params.y = y;
     }
 
+     /**
+      * Move a glyph. It is overloaded in CompositeGlyph in order to update all child glyphs position too.
+      * @param x  Moving on the x-axis. Passing negative value causes move to the left, positive value to the right.
+      * @param y  Moving on the y-axis. Passing negative value causes move up, positive value - move down.
+      */
+    virtual void MoveGlyph(width_t x, height_t y){
+        SetPosition(m_params.x + x, m_params.y + y);
+    }
+
     void SetGlyphParams(const GlyphParams& params) { m_params = params; }
     const GlyphParams& GetGlyphParams() const { return m_params; }
     width_t GetWidth() const { return m_params.width; }

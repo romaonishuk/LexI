@@ -205,6 +205,17 @@ std::shared_ptr<Row> Page::GetNextRow(IGlyph::GlyphPtr &row)
 // TODO(rmn): proper name
 void Page::ProcessBackspace(Gui::Window* window)
 {
+    auto moveUpLowerRows = [&](auto startRowIt) {
+        // Update the rows below
+        for(; startRowIt != m_components.end(); ++startRowIt) {
+            auto& row = *startRowIt;
+            row->ClearGlyph(window);
+            window->FillRectangle(row->GetGlyphParams(), Color::kWhite);  // TODO(rmn): fix
+            row->MoveGlyph(0, -m_currentRow->GetHeight());
+            row->Draw(window);
+        }
+    };
+
     if(m_currentRow == m_components.front()) {
         auto previousPage = m_parent->SwitchPage(window, TextView::SwitchDirection::kPrev, false);
         if(!previousPage) {
@@ -220,15 +231,9 @@ void Page::ProcessBackspace(Gui::Window* window)
     if(m_currentRow->IsEmpty()) {
         m_components.remove(m_currentRow);
         m_currentRow = previousRow;
-        m_currentRow->DrawCursor(window);
+        m_currentRow->DrawCursorAtEnd(window);
 
-        // Update the rows below
-        auto it = std::find(m_components.begin(), m_components.end(), previousRow);
-        for(++it; it != m_components.end(); ++it) {
-            auto& row = *it;
-            const auto& position = row->GetPosition();
-            row->SetPosition(position.x, position.y - m_currentRow->GetHeight());
-        }
+        moveUpLowerRows(std::next(prevRowIt));
 
         // TODO(rmn): Update all other rows in other pages
         return;
@@ -243,6 +248,10 @@ void Page::ProcessBackspace(Gui::Window* window)
 
         m_currentRow->Remove(window, m_currentRow->GetFirstChar());
         m_currentRow = previousRow;
+        m_currentRow->DrawCursor(window);
+    } else if(previousRow->IsEmpty()) {
+        moveUpLowerRows(std::next(prevRowIt));
+        m_components.erase(prevRowIt);
         m_currentRow->DrawCursor(window);
     } else {
         auto prevRowCapacity = previousRow->GetFreeSpace();
