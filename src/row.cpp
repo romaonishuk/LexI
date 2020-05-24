@@ -206,6 +206,20 @@ std::optional<ICompositeGlyph::GlyphList> Row::Insert(std::shared_ptr<Row>& row)
     return Insert(position, std::move(tmpList));
 }
 
+std::optional<ICompositeGlyph::GlyphList> Row::Insert(std::shared_ptr<Row>&& row)
+{
+    if(row->m_components.empty()) {
+        return {};
+    }
+
+    auto position = m_components.empty() ? m_params.x : m_components.back()->GetRightBorder();
+    if(m_components.empty()) {
+        AddCharacter({m_params.x, m_params.y}, row->m_components.front());
+        row->m_components.pop_front();
+    }
+    return Insert(position, std::move(std::move(row->m_components)));
+}
+
 std::optional<ICompositeGlyph::GlyphList> Row::Insert(
     size_t insertPosition, std::list<IGlyph::GlyphPtr>&& itemsToInsert)
 {
@@ -252,6 +266,17 @@ std::optional<ICompositeGlyph::GlyphList> Row::Insert(
     ReDraw(cursor.GetCurrentWindow());
     //    cursor.MoveCursor(window, {position, m_params.y, cursorWidth, m_params.height});
     return result;
+}
+
+void Row::ReWrite(std::shared_ptr<Row>&& row)
+{
+    m_components.clear();
+    m_usedWidth = 0;
+
+    m_components = std::move(row->m_components);
+    for(auto& it: m_components) {
+        it->SetPosition(it->GetPosition().x, m_params.y);
+    }
 }
 
 // --- Removal ---

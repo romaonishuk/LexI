@@ -104,18 +104,16 @@ std::shared_ptr<Page> TextView::AddPage(Gui::Window* window, const GlyphPtr& cur
 // TODO(rmn): remove after full smart pointers move
 std::shared_ptr<Page> TextView::AddPage(Gui::Window* window, const Page* page)
 {
-    auto pageIt = std::find_if(m_components.begin(), m_components.end(), [&](const auto& elem){
-        return elem.get() == page;
-    });
+    auto pageIt =
+        std::find_if(m_components.begin(), m_components.end(), [&](const auto& elem) { return elem.get() == page; });
     assert(pageIt != m_components.end());
-    return  AddPage(window, *pageIt);
+    return AddPage(window, *pageIt);
 }
 
 std::shared_ptr<Page> TextView::GetNextPage(const Page* page)
 {
-    auto nextPage = std::find_if(m_components.begin(), m_components.end(), [&](const auto& elem){
-        return elem.get() == page;
-    });
+    auto nextPage =
+        std::find_if(m_components.begin(), m_components.end(), [&](const auto& elem) { return elem.get() == page; });
     assert(nextPage != m_components.end());
     nextPage++;
     if(nextPage == m_components.end()) {
@@ -196,4 +194,30 @@ std::shared_ptr<Page> TextView::SwitchPage(Gui::Window* window, SwitchDirection 
     }
     m_currentPage->DrawCursor(window);
     return m_currentPage;
+}
+
+bool TextView::RemovePage(std::shared_ptr<Page>& page)
+{
+    auto it = std::find(m_components.begin(), m_components.end(), page);
+    if(it == m_components.end()) {
+        return false;
+    }
+
+    it = m_components.erase(it);
+    for(; it != m_components.end(); ++it) {
+        (*it)->MoveGlyph(0, pageHeight);
+    }
+    UpdateVisiblePages();
+    ReDraw(Lexi::Cursor::Get().GetCurrentWindow());
+    // TODO(rmn): update page number callback
+
+    return true;
+}
+
+void TextView::SetCurrentPage(Page* page)
+{
+    auto it =
+        std::find_if(m_components.begin(), m_components.end(), [&](const auto& elem) { return elem.get() == page; });
+    assert(it != m_components.end());
+    m_currentPage = std::static_pointer_cast<Page>(*it);
 }

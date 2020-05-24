@@ -25,9 +25,15 @@ public:
     std::shared_ptr<Row> GetFirstRow();
     void SetCurrentRow(std::shared_ptr<Row> row){m_currentRow = std::move(row);}
 
+    [[nodiscard]] bool IsEmpty() const { return m_components.empty();}
+    [[nodiscard]] bool IsFull() const;
+    std::shared_ptr<Row> RemoveFirstRow();
+
 private:
-    void ProcessBackspace(Gui::Window*);
+    void ProcessBackspaceFromBeginning(Gui::Window*);
     void ProcessCharacterShift(std::shared_ptr<Row>&, IGlyph::GlyphPtr&);
+
+    void MoveUpLowerRows(Gui::Window* w, std::list<IGlyph::GlyphPtr>::iterator startRowIt);
 
     std::shared_ptr<Row> GetPreviousRow();
     std::shared_ptr<Row> GetPreviousRow(IGlyph::GlyphPtr &row);

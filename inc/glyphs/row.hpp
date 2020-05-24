@@ -25,14 +25,17 @@ public:
 
     std::optional<GlyphPtr> AddCharacter(char c);
     std::optional<GlyphPtr> AddCharacter(const Point& position, IGlyph::GlyphPtr newChar);
-    GlyphPtr InsertChar(Gui::Window* window, std::shared_ptr<Character> &newChar, const Point& p);
+    GlyphPtr InsertChar(Gui::Window* window, std::shared_ptr<Character>& newChar, const Point& p);
 
     void Remove(Gui::Window* window, const GlyphPtr& ptr);
     GlyphList Cut(size_t startPosition, size_t pixelsCount);
 
     using ICompositeGlyph::Insert;
     std::optional<GlyphList> Insert(std::shared_ptr<Row>& row);
+    std::optional<ICompositeGlyph::GlyphList> Insert(std::shared_ptr<Row>&& row);
     std::optional<GlyphList> Insert(size_t insertPosition, std::list<GlyphPtr>&&);
+
+    void ReWrite(std::shared_ptr<Row>&& row);
 
     [[nodiscard]] bool IsEmpty() const { return m_components.empty(); }
     [[nodiscard]] bool IsFull() const;

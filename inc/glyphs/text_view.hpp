@@ -35,7 +35,8 @@ public:
 
     [[nodiscard]] std::string GetWindowName() const override { return "Text View"; }
 
-    void SetCurrentPage(std::shared_ptr<Page> page) {m_currentPage = std::move(page);}
+    void SetCurrentPage(std::shared_ptr<Page> page) { m_currentPage = std::move(page); }
+    void SetCurrentPage(Page* page);
     [[nodiscard]] uint32_t GetPageCount() const { return m_components.size(); }
     [[nodiscard]] uint32_t GetPageHeight() const { return pageHeight; }
     [[nodiscard]] GlyphParams GetVisibleArea() const { return m_visibleArea; }
@@ -52,6 +53,8 @@ public:
 
     void UpdateVisibleArea(height_t h);
     void UpdateVisibleArea(Gui::Window* window);
+
+    bool RemovePage(std::shared_ptr<Page>& page);
 
 private:
     void UpdateVisiblePages();
