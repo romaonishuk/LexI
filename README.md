@@ -15,6 +15,9 @@
 
 *Note*: some of the patterns are WIP state and may distinguish from the implementation provided in GoF 
 
+## [Functionality demo](https://github.com/romaonishuk/LexI/blob/master/docs/functionality_demo/demo.md)
+Projects functionality(in Gif format) across the versions
+
 ## In Progress
 - Finishing text editor
 
