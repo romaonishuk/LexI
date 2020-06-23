@@ -1,0 +1,17 @@
+language: cpp
+dist: bionic
+sudo: true
+compiler:
+- clang
+- gcc
+os:
+- linux
+script:
+  - mkdir -p build
+  - cd build
+  - cmake -DCMAKE_BUILD_TYPE=Debug ..
+  - make
+
+after_success:
+  - cd ..
+  - rm -rf build
