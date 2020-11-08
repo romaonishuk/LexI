@@ -212,7 +212,7 @@ void Page::MoveUpLowerRows(Gui::Window* window, std::list<IGlyph::GlyphPtr>::ite
         row->MoveGlyph(0, -m_currentRow->GetHeight());
         row->Draw(window);
     }
-};
+}
 
 std::shared_ptr<Row> Page::RemoveFirstRow()
 {

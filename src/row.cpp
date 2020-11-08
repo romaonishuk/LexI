@@ -73,7 +73,7 @@ void Row::ProcessEvent(Gui::Window* window, const Event& event)
         return;
     }
 
-    const auto* key = static_cast<const Lexi::KeyBoardEvent*>(&event);
+    const auto* key = dynamic_cast<const Lexi::KeyBoardEvent*>(&event);
     auto cursorPosition = Point(cursor.GetPosition().x, m_params.y);
     auto currentGlyph = std::find_if(
         m_components.begin(), m_components.end(), [&](const auto& c) { return c->Intersects(cursorPosition); });

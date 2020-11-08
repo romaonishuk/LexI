@@ -2,7 +2,6 @@ language: cpp
 dist: bionic
 sudo: true
 compiler:
-- clang
 - gcc
 os:
 - linux
