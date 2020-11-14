@@ -83,6 +83,7 @@ std::shared_ptr<Page> TextView::AddPage(Gui::Window* window, const GlyphPtr& cur
 {
     assert(m_onPageAdded);
 
+    // Add page to the end
     if(currentPage == m_components.back()) {
         auto newPageParams = currentPage->GetGlyphParams();
         newPageParams.y = newPageParams.y + newPageParams.height + pageSeparator;
@@ -112,10 +113,12 @@ std::shared_ptr<Page> TextView::AddPage(Gui::Window* window, const Page* page)
 
 std::shared_ptr<Page> TextView::GetNextPage(const Page* page)
 {
-    auto nextPage =
-        std::find_if(m_components.begin(), m_components.end(), [&](const auto& elem) { return elem.get() == page; });
-    assert(nextPage != m_components.end());
-    nextPage++;
+    auto currentPage =std::find_if(m_components.begin(), m_components.end(), [&](const auto& elem) {
+        return elem.get() == page;
+    });
+    assert(currentPage != m_components.end());
+
+    auto nextPage = std::next(currentPage);
     if(nextPage == m_components.end()) {
         std::cout << "Given page is last!" << std::endl;
         return nullptr;

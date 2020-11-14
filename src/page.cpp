@@ -51,7 +51,7 @@ void Page::ProcessCharacterShift(std::shared_ptr<Row>& row, IGlyph::GlyphPtr& ne
     std::shared_ptr<Row> nextRow;
     std::shared_ptr<Page> nextPage;
     if(row == m_components.back()) {
-        if(IsLastRow(row)) {
+        if(IsBottomRow(row)) {
             nextPage = m_parent->GetNextPage(this);
             if(!nextPage) {
                 nextPage = m_parent->AddPage(Lexi::Cursor::Get().GetCurrentWindow(), this);
@@ -103,11 +103,15 @@ void Page::ProcessEvent(Gui::Window* window, const Event& event)
     switch(static_cast<Lexi::Key>(key->m_key)) {
         case Lexi::Key::kEnter: {
             auto fontHeight = Lexi::FontManager::Get().GetCharHeight();
-            if(!IsLastRow(m_currentRow)) {
-                m_currentRow = std::make_shared<Row>(
+            if(!IsBottomRow(m_currentRow)) {
+                auto movedItems = m_currentRow->Cut(cursor.GetPosition().x + 1, m_currentRow->GetUsedSpace());
+                auto newRow = std::make_shared<Row>(
                     GlyphParams{m_params.x + m_leftIndent, m_currentRow->GetPosition().y + fontHeight,
                         m_params.width - m_leftIndent - m_rightIndent, fontHeight});
-                Add(m_currentRow);
+                //TODO: recursive
+                newRow->Insert(m_currentRow->GetPosition().x, std::move(movedItems));
+                InsertAfter(m_currentRow, newRow);
+                m_currentRow = newRow;
                 m_currentRow->DrawCursor(window);
             } else {
                 auto nextPage = m_parent->SwitchPage(window, TextView::SwitchDirection::kNext, true);
@@ -172,7 +176,7 @@ std::shared_ptr<Row> Page::GetFirstRow()
     return std::static_pointer_cast<Row>(m_components.front());
 }
 
-bool Page::IsLastRow(const GlyphPtr& row) const
+bool Page::IsBottomRow(const GlyphPtr& row) const
 {
     return row->GetBottomBorder() + Lexi::FontManager::Get().GetCharHeight() >
         m_params.y + m_params.height - m_botIndent;
@@ -288,7 +292,7 @@ void Page::ProcessBackspaceFromBeginning(Gui::Window* window)
             // Removed last line in a page.
             if(m_currentRow == m_components.back()) {
                 // Need to update all other pages
-                if(IsLastRow(m_currentRow)) {
+                if(IsBottomRow(m_currentRow)) {
                     auto nextPage = m_parent->GetNextPage(this);
                     if(!nextPage->IsEmpty()) {
                         m_currentRow->ReWrite(nextPage->RemoveFirstRow());

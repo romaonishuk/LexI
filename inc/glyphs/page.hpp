@@ -20,7 +20,7 @@ public:
 
     void DrawCursor(Gui::Window* window);
 
-    [[nodiscard]] bool IsLastRow(const GlyphPtr&) const;
+    [[nodiscard]] bool IsBottomRow(const GlyphPtr&) const;
 
     std::shared_ptr<Row> GetFirstRow();
     void SetCurrentRow(std::shared_ptr<Row> row){m_currentRow = std::move(row);}
@@ -33,6 +33,10 @@ private:
     void ProcessBackspaceFromBeginning(Gui::Window*);
     void ProcessCharacterShift(std::shared_ptr<Row>&, IGlyph::GlyphPtr&);
 
+    /**
+     * For each row in page, starting from @p startRowIt, updates their position to previous row.
+     * @param startRowIt Row from which begin shift/
+     */
     void MoveUpLowerRows(Gui::Window* w, std::list<IGlyph::GlyphPtr>::iterator startRowIt);
 
     std::shared_ptr<Row> GetPreviousRow();

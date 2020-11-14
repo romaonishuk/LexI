@@ -6,7 +6,8 @@
 #define LEXI_I_COMPOSITE_GLYPH_HPP
 
 #include <list>
-#include <string>
+#include <algorithm>
+#include <cassert>
 
 #include "i_glyph.hpp"
 
@@ -21,66 +22,35 @@ class ICompositeGlyph: public IGlyph
 public:
     using GlyphList = std::list<GlyphPtr>;
 
-    explicit ICompositeGlyph(const GlyphParams params): IGlyph(params) {}
-
-    void Draw(Gui::Window* window) override
-    {
-        for(auto& it: m_components) {
-            it->Draw(window);
-        }
-    }
-
-    void DrawAt(Gui::Window* window, const Point& point) override
-    {
-        for(auto& it: m_components) {
-            it->DrawAt(window, point);
-        }
-    }
-
+    explicit ICompositeGlyph(const GlyphParams params);
     ~ICompositeGlyph() override = default;
 
-    void Insert(GlyphPtr glyph, size_t pos) override
-    {
-        if(pos > m_components.size()) {
-            m_components.push_back(std::move(glyph));
-        } else {
-            auto iter = m_components.begin();
-            std::advance(iter, pos);
-            m_components.insert(iter, std::move(glyph));
-        }
-    }
+    void Draw(Gui::Window* window) override;
+    void DrawAt(Gui::Window* window, const Point& point) override;
 
-    void ProcessEvent(Gui::Window* w, const Event& event) override
-    {
-        const auto& point = event.GetPoint();
-        if(Intersects(point)) {
-            for(const auto& it: m_components) {
-                if(it->Intersects(point)) {
-                    return it->ProcessEvent(w, event);
-                }
-            }
-        }
-    }
+    void ProcessEvent(Gui::Window* w, const Event& event) override;
 
-    void Add(GlyphPtr glyph) override { m_components.push_back(std::move(glyph)); }
+    void Add(GlyphPtr glyph) override;
+    void Insert(GlyphPtr glyph, size_t pos) override;
+
+    /**
+     * Insert @p glyphToInsert after @p glyph
+     */
+    template <typename T>
+    void InsertAfter(const std::shared_ptr<T>& glyph, const std::shared_ptr<T>& glyphToInsert)
+    {
+        auto res = std::find_if(m_components.begin(), m_components.end(), [&](const auto& it){
+          return it.get() == glyph.get();
+        });
+        assert(res != m_components.end());
+        res = std::next(res);
+        m_components.insert(res, glyphToInsert);
+    }
 
     //    void Remove();
-    GlyphPtr Find(const Point& point)
-    {
-        for(auto& it: m_components) {
-            if(it->Intersects(point)) {
-                return it;
-            }
-        }
-        return nullptr;
-    }
+    GlyphPtr Find(const Point& point);
 
-    void MoveGlyph(width_t x, height_t y) override {
-        IGlyph::MoveGlyph(x, y);
-        for(auto&it: m_components) {
-            it->MoveGlyph(x, y);
-        }
-    }
+    void MoveGlyph(width_t x, height_t y) override;
 
 protected:
     GlyphList m_components;

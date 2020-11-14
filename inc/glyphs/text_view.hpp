@@ -49,6 +49,12 @@ public:
     std::shared_ptr<Page> SwitchPage(Gui::Window*, SwitchDirection, bool);
     std::shared_ptr<Page> AddPage(Gui::Window* window, const GlyphPtr& currentPage);
     std::shared_ptr<Page> AddPage(Gui::Window* window, const Page* page);
+
+    /**
+     * Find next to the @p page page in page list.
+     * @param page Page for which to find the next page.
+     * @return Pointer to the next page, nullptr if @p page is last one.
+     */
     std::shared_ptr<Page> GetNextPage(const Page* page);
 
     void UpdateVisibleArea(height_t h);

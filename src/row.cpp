@@ -138,7 +138,7 @@ IGlyph::GlyphPtr Row::InsertChar(Gui::Window* window, std::shared_ptr<Character>
 
     auto& lastChar = m_components.back();
     // Add to end. No need to redraw other characters
-    if(lastChar->Intersects(position)) {
+    if(lastChar->Intersects(position) && position.x != m_params.x) {
         if(IsFull()) {
             return newChar;
         } else {
@@ -220,9 +220,15 @@ std::optional<ICompositeGlyph::GlyphList> Row::Insert(std::shared_ptr<Row>&& row
     return Insert(position, std::move(std::move(row->m_components)));
 }
 
-std::optional<ICompositeGlyph::GlyphList> Row::Insert(
-    size_t insertPosition, std::list<IGlyph::GlyphPtr>&& itemsToInsert)
+std::optional<ICompositeGlyph::GlyphList> Row::Insert(size_t insertPosition, std::list<GlyphPtr>&& itemsToInsert)
 {
+    auto updateElements = [&](width_t offset){
+      for(auto& it: itemsToInsert) {
+          it->SetPosition(offset, m_params.y);
+          offset += it->GetWidth() + 1;
+      }
+    };
+
     std::optional<GlyphList> result;
 
     width_t itemsToInsertWidth =
@@ -230,6 +236,14 @@ std::optional<ICompositeGlyph::GlyphList> Row::Insert(
             init += item->GetWidth();
             return init;
         });
+
+    if(m_components.empty()) {
+        updateElements(m_params.x);
+        std::swap(m_components, itemsToInsert);
+        m_usedWidth += itemsToInsertWidth;
+        ReDraw(cursor.GetCurrentWindow());
+        return result;
+    }
 
     auto insertionElement = std::find_if(m_components.begin(), m_components.end(),
         [&](const auto& glyph) { return glyph->Intersects(Point(insertPosition, m_params.y)); });
@@ -240,10 +254,7 @@ std::optional<ICompositeGlyph::GlyphList> Row::Insert(
     }
 
     width_t offset = (*std::prev(insertionElement))->GetRightBorder() + 1;
-    for(auto& it: itemsToInsert) {
-        it->SetPosition(offset, m_params.y);
-        offset += it->GetWidth() + 1;
-    }
+    updateElements(offset);
 
     m_components.insert(insertionElement, itemsToInsert.begin(), itemsToInsert.end());
 
@@ -343,7 +354,7 @@ ICompositeGlyph::GlyphList Row::Cut(size_t startPosition, size_t pixelsCount)
     // get all chars that left
     // TODO(rmn): what about images?
     if(lastCutElement == m_components.end()) {
-        result.splice(result.begin(), m_components, firstCutElement);
+        result.splice(result.begin(), m_components, firstCutElement, m_components.end());
     } else {
         // We don't need half of symbol
         if(lastPixel == (*lastCutElement)->GetRightBorder()) {

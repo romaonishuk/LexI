@@ -25,6 +25,13 @@ public:
 
     std::optional<GlyphPtr> AddCharacter(char c);
     std::optional<GlyphPtr> AddCharacter(const Point& position, IGlyph::GlyphPtr newChar);
+
+    /**
+     * Insert @p newChar to the row. Redraws row if necessary
+     * @param newChar Char to insert.
+     * @param p Insertion point.
+     * @return Pointer to the popped element, if the raw is full, null otherwise.
+     */
     GlyphPtr InsertChar(Gui::Window* window, std::shared_ptr<Character>& newChar, const Point& p);
 
     void Remove(Gui::Window* window, const GlyphPtr& ptr);
