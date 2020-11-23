@@ -17,11 +17,13 @@ height_t Page::m_botIndent = 25;
 width_t Page::m_leftIndent = 50;
 width_t Page::m_rightIndent = 75;
 
+using Lexi::FontManager;
+
 Page::Page(TextView* parent, const GlyphParams& params): ICompositeGlyph(params), m_parent(parent)
 {
     m_currentRow = std::make_shared<Row>(
-        GlyphParams{m_leftIndent, m_params.y + m_topIndent + Lexi::FontManager::Get().GetCharHeight(),
-            m_params.width - m_leftIndent - m_rightIndent, Lexi::FontManager::Get().GetCharHeight()});
+        GlyphParams{m_leftIndent, m_params.y + m_topIndent + FontManager::Get().GetCharHeight(),
+            m_params.width - m_leftIndent - m_rightIndent, FontManager::Get().GetCharHeight()});
     ICompositeGlyph::Add(m_currentRow);
 }
 
@@ -60,8 +62,8 @@ void Page::ProcessCharacterShift(std::shared_ptr<Row>& row, IGlyph::GlyphPtr& ne
             nextPage->SetCurrentRow(nextRow);
         } else {
             nextRow = std::make_shared<Row>(
-                GlyphParams{m_leftIndent, row->GetPosition().y + Lexi::FontManager::Get().GetCharHeight(),
-                    m_params.width - m_leftIndent - m_rightIndent, Lexi::FontManager::Get().GetCharHeight()});
+                GlyphParams{m_leftIndent, row->GetPosition().y + FontManager::Get().GetCharHeight(),
+                    m_params.width - m_leftIndent - m_rightIndent, FontManager::Get().GetCharHeight()});
             ICompositeGlyph::Add(nextRow);
         }
     } else {
@@ -102,21 +104,43 @@ void Page::ProcessEvent(Gui::Window* window, const Event& event)
 
     switch(static_cast<Lexi::Key>(key->m_key)) {
         case Lexi::Key::kEnter: {
-            auto fontHeight = Lexi::FontManager::Get().GetCharHeight();
-            if(!IsBottomRow(m_currentRow)) {
-                auto movedItems = m_currentRow->Cut(cursor.GetPosition().x + 1, m_currentRow->GetUsedSpace());
-                auto newRow = std::make_shared<Row>(
-                    GlyphParams{m_params.x + m_leftIndent, m_currentRow->GetPosition().y + fontHeight,
-                        m_params.width - m_leftIndent - m_rightIndent, fontHeight});
-                //TODO: recursive
-                newRow->Insert(m_currentRow->GetPosition().x, std::move(movedItems));
-                InsertAfter(m_currentRow, newRow);
-                m_currentRow = newRow;
-                m_currentRow->DrawCursor(window);
-            } else {
-                auto nextPage = m_parent->SwitchPage(window, TextView::SwitchDirection::kNext, true);
-                //                nextPage->Ad
+            auto movedItems = m_currentRow->Cut(cursor.GetPosition().x + 1, m_currentRow->GetWidth());
+            GlyphParams params{m_currentRow->GetGlyphParams()};
+            params.y += m_currentRow->GetHeight();
+
+            auto newRow = std::make_shared<Row>(params, std::move(movedItems));
+            Insert(newRow, GetGlyphPosition(std::static_pointer_cast<IGlyph>(m_currentRow)) + 1);
+
+            auto isLast = IsBottomRow(m_currentRow);
+            m_currentRow = newRow;
+            cursor.MoveCursor(window, m_currentRow->GetGlyphParams());
+
+            // Recursively update all pages below
+            auto currentPage = this;
+            while(currentPage->m_components.back()->GetBottomBorder() + m_botIndent >= currentPage->GetBottomBorder()) {
+                auto nextPage = currentPage->m_parent->GetNextPage(currentPage);
+                if(!nextPage) {
+                    std::cout << "Creating new page as a result of Enter press" << std::endl;
+                    nextPage = currentPage->m_parent->AddPage(window, currentPage);
+                }
+
+                auto lastRow = currentPage->m_components.back();
+                currentPage->m_components.pop_back();
+
+                auto deltaY = nextPage->GetGlyphParams().y + m_topIndent +
+                        FontManager::Get().GetCharHeight() - lastRow->GetPosition().y;
+                lastRow->MoveGlyph(0, deltaY);
+                nextPage->Insert(lastRow, 0);
+                currentPage = nextPage.get();
             }
+
+            if(isLast) {
+                m_parent->SwitchPage(window, TextView::SwitchDirection::kNext, false);
+            }
+
+            // TODO(rmn): Redrawing whole page not optimal way
+            m_parent->UpdateVisiblePages();
+            m_parent->ReDraw(window);
         } break;
         case Lexi::Key::kArrowUp: {
             if(m_currentRow == m_components.front()) {
@@ -315,6 +339,19 @@ void Page::ProcessBackspaceFromBeginning(Gui::Window* window)
             m_currentRow = previousRow;
             m_currentRow->DrawCursor(window);
         }
+    }
+}
+
+void Page::Insert(GlyphPtr glyph, size_t position)
+{
+    ICompositeGlyph::Insert(glyph, position);
+
+    auto it = std::find(m_components.begin(), m_components.end(), glyph);
+    assert((it != m_components.end()) && "Couldn't find previously inserted glyph");
+
+    for(it = std::next(it); it != m_components.end(); ++it) {
+        auto& row = *it;
+        row->MoveGlyph(0, glyph->GetHeight());
     }
 }
 

@@ -18,6 +18,11 @@ auto& cursor = Lexi::Cursor::Get();
 Row::Row(const GlyphParams& params): ICompositeGlyph(params)
 {}
 
+Row::Row(const GlyphParams& params, ICompositeGlyph::GlyphList&& list):
+    ICompositeGlyph(params){
+    Insert(0, std::move(list));
+}
+
 bool Row::IsFull() const
 {
     return m_usedWidth + Lexi::FontManager::Get().GetCharWidth() >= m_params.width;

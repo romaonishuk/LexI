@@ -16,6 +16,8 @@ const auto pageSeparator = 20;
 
 class TextView: public Gui::Window
 {
+    using PagePtr = std::shared_ptr<Page>;
+
 public:
     enum class SwitchDirection
     {
@@ -55,15 +57,15 @@ public:
      * @param page Page for which to find the next page.
      * @return Pointer to the next page, nullptr if @p page is last one.
      */
-    std::shared_ptr<Page> GetNextPage(const Page* page);
+    PagePtr GetNextPage(const Page* page);
 
     void UpdateVisibleArea(height_t h);
     void UpdateVisibleArea(Gui::Window* window);
+    void UpdateVisiblePages();
 
     bool RemovePage(std::shared_ptr<Page>& page);
 
 private:
-    void UpdateVisiblePages();
 
     // Relative square currently shown on display.
     GlyphParams m_visibleArea;

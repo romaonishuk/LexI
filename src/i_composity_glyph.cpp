@@ -33,13 +33,22 @@ void ICompositeGlyph::ProcessEvent(Gui::Window* w, const Event& event)
 
 void ICompositeGlyph::Insert(GlyphPtr glyph, size_t pos)
 {
-    if(pos > m_components.size()) {
+    if(pos >= m_components.size()) {
         m_components.push_back(std::move(glyph));
     } else {
         auto iter = m_components.begin();
         std::advance(iter, pos);
         m_components.insert(iter, std::move(glyph));
     }
+}
+
+size_t ICompositeGlyph::GetGlyphPosition(const GlyphPtr& glyph)
+{
+    auto res = std::find_if(m_components.cbegin(), m_components.cend(), [&](const auto& it){
+      return it == glyph;
+    });
+    assert((res != m_components.cend()) && "Given glyph doesn't belong to this CompositeGlyph!");
+    return std::distance(m_components.cbegin(), res);
 }
 
 void ICompositeGlyph::Add(GlyphPtr glyph) { m_components.push_back(std::move(glyph)); }

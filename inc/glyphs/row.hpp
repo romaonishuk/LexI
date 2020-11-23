@@ -16,6 +16,7 @@ class Row: public ICompositeGlyph
 {
 public:
     explicit Row(const GlyphParams& params);
+    Row(const GlyphParams& params, ICompositeGlyph::GlyphList&& list);
 
     void ProcessEvent(Gui::Window* w, const Event& event) override;
     void Draw(Gui::Window* window) override;

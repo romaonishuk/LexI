@@ -37,16 +37,19 @@ public:
      * Insert @p glyphToInsert after @p glyph
      */
     template <typename T>
-    void InsertAfter(const std::shared_ptr<T>& glyph, const std::shared_ptr<T>& glyphToInsert)
+    GlyphList::iterator InsertAfter(const std::shared_ptr<T>& glyph, const std::shared_ptr<T>& glyphToInsert)
     {
         auto res = std::find_if(m_components.begin(), m_components.end(), [&](const auto& it){
           return it.get() == glyph.get();
         });
         assert(res != m_components.end());
         res = std::next(res);
-        m_components.insert(res, glyphToInsert);
+        return m_components.insert(res, glyphToInsert);
     }
-
+    /**
+     * @return Distance to the @p glyph from components beginning.
+     */
+    size_t GetGlyphPosition(const GlyphPtr& glyph);
     //    void Remove();
     GlyphPtr Find(const Point& point);
 

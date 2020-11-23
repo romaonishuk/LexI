@@ -111,12 +111,13 @@ std::shared_ptr<Page> TextView::AddPage(Gui::Window* window, const Page* page)
     return AddPage(window, *pageIt);
 }
 
-std::shared_ptr<Page> TextView::GetNextPage(const Page* page)
+TextView::PagePtr TextView::GetNextPage(const Page* page)
 {
-    auto currentPage =std::find_if(m_components.begin(), m_components.end(), [&](const auto& elem) {
+    auto currentPage = std::find_if(m_components.begin(), m_components.end(), [&](const auto& elem) {
         return elem.get() == page;
     });
-    assert(currentPage != m_components.end());
+
+    assert((currentPage != m_components.end()) && "Requested page doesn't belong to TextView.");
 
     auto nextPage = std::next(currentPage);
     if(nextPage == m_components.end()) {

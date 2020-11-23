@@ -12,6 +12,8 @@ class Row;
 
 class Page: public ICompositeGlyph
 {
+    using RowPtr = std::shared_ptr<Row>;
+
 public:
     explicit Page(TextView* parent, const GlyphParams& params);
 
@@ -28,6 +30,14 @@ public:
     [[nodiscard]] bool IsEmpty() const { return m_components.empty();}
     [[nodiscard]] bool IsFull() const;
     std::shared_ptr<Row> RemoveFirstRow();
+
+    /**
+     * Insert @p row in the beginning of the page
+     * @note All glyphs after @p position will be moved down accordingly.
+     * @param row Row to insert.
+     * @param position Position to insert.
+     */
+    void Insert(GlyphPtr glyph, size_t position) override;
 
 private:
     void ProcessBackspaceFromBeginning(Gui::Window*);
