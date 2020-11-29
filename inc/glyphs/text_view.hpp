@@ -53,17 +53,29 @@ public:
     std::shared_ptr<Page> AddPage(Gui::Window* window, const Page* page);
 
     /**
-     * Find next to the @p page page in page list.
+     * Find next to the @p page in page list.
      * @param page Page for which to find the next page.
      * @return Pointer to the next page, nullptr if @p page is last one.
      */
     PagePtr GetNextPage(const Page* page);
+    /**
+     * Find previous to @p page Page.
+     * @param page Page regarding which to find previous Page.
+     * @return Pointer to the previous page, nullptr if @p or previous page was not found.
+     */
+    PagePtr GetPreviousPage(const Page* page);
 
     void UpdateVisibleArea(height_t h);
     void UpdateVisibleArea(Gui::Window* window);
     void UpdateVisiblePages();
 
     bool RemovePage(std::shared_ptr<Page>& page);
+    /**
+     * Remove @p page. Update all pages below and redrow the content.
+     * @param page Pointer to the page to remove.
+     * @return True if page was found in the list.
+     */
+    bool RemovePage(Page* page);
 
 private:
 

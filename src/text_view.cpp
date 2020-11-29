@@ -127,6 +127,21 @@ TextView::PagePtr TextView::GetNextPage(const Page* page)
     return std::static_pointer_cast<Page>(*nextPage);
 }
 
+TextView::PagePtr TextView::GetPreviousPage(const Page* page)
+{
+    auto currentPage = std::find_if(m_components.begin(), m_components.end(), [&](const auto& elem) {
+      return elem.get() == page;
+    });
+
+    assert((currentPage != m_components.end()) && "Requested page doesn't belong to TextView.");
+    auto previousPage = std::prev(currentPage);
+    if(previousPage == m_components.end()) {
+        std::cout << "Given page is first!" << std::endl;
+        return nullptr;
+    }
+    return std::static_pointer_cast<Page>(*previousPage);
+}
+
 // TODO(rmn): optimize
 void TextView::UpdateVisiblePages()
 {
@@ -200,9 +215,9 @@ std::shared_ptr<Page> TextView::SwitchPage(Gui::Window* window, SwitchDirection 
     return m_currentPage;
 }
 
-bool TextView::RemovePage(std::shared_ptr<Page>& page)
+bool TextView::RemovePage(Page* page)
 {
-    auto it = std::find(m_components.begin(), m_components.end(), page);
+    auto it = std::find_if(m_components.begin(), m_components.end(), [=](const auto& it){return it.get() == page;});
     if(it == m_components.end()) {
         return false;
     }
@@ -216,6 +231,11 @@ bool TextView::RemovePage(std::shared_ptr<Page>& page)
     // TODO(rmn): update page number callback
 
     return true;
+}
+
+bool TextView::RemovePage(std::shared_ptr<Page>& page)
+{
+    return RemovePage(page.get());
 }
 
 void TextView::SetCurrentPage(Page* page)

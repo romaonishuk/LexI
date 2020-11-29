@@ -29,6 +29,14 @@ public:
 
     [[nodiscard]] bool IsEmpty() const { return m_components.empty();}
     [[nodiscard]] bool IsFull() const;
+
+    /**
+     * Check whether a new row can be added to the current Page.
+     * @todo remplace IsFull with this.
+     * @param height Height of the new row.
+     * @return True if new row fits to the page params.
+     */
+    [[nodiscard]] bool RowCanBeAdded(height_t height) const;
     std::shared_ptr<Row> RemoveFirstRow();
 
     /**
@@ -53,6 +61,10 @@ private:
     std::shared_ptr<Row> GetPreviousRow(IGlyph::GlyphPtr &row);
     std::shared_ptr<Row> GetNextRow();
     std::shared_ptr<Row> GetNextRow(IGlyph::GlyphPtr &row);
+    /**
+     * @return Pointer to the last row.
+     */
+    RowPtr GetLastRow();
 
     // text view indentations
     static height_t m_topIndent;

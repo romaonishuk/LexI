@@ -60,7 +60,7 @@ struct GlyphParams
         return false;
     }
 
-    bool IsIntersects(const GlyphParams& params)
+    bool IsIntersects(const GlyphParams& params) const
     {
         return IsIntersects({params.x, params.y}) || IsIntersects({params.x + params.width, params.y}) ||
             IsIntersects({params.x, params.y + params.height}) ||

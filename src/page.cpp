@@ -122,6 +122,8 @@ void Page::ProcessEvent(Gui::Window* window, const Event& event)
                 if(!nextPage) {
                     std::cout << "Creating new page as a result of Enter press" << std::endl;
                     nextPage = currentPage->m_parent->AddPage(window, currentPage);
+                    // Remove default created first row, since it will be replaced by moved row
+                    nextPage->m_components.pop_front();
                 }
 
                 auto lastRow = currentPage->m_components.back();
@@ -132,6 +134,7 @@ void Page::ProcessEvent(Gui::Window* window, const Event& event)
                 lastRow->MoveGlyph(0, deltaY);
                 nextPage->Insert(lastRow, 0);
                 currentPage = nextPage.get();
+                currentPage->SetCurrentRow(std::dynamic_pointer_cast<Row>(lastRow));
             }
 
             if(isLast) {
@@ -144,7 +147,12 @@ void Page::ProcessEvent(Gui::Window* window, const Event& event)
         } break;
         case Lexi::Key::kArrowUp: {
             if(m_currentRow == m_components.front()) {
-                m_parent->SwitchPage(window, TextView::SwitchDirection::kPrev, true);
+                auto prevPage = m_parent->GetPreviousPage(this);
+                if(prevPage) {
+                    prevPage->SetCurrentRow(prevPage->GetLastRow());
+                    m_parent->SetCurrentPage(prevPage);
+                    prevPage->DrawCursor(window);
+                }
             } else {
                 m_currentRow = GetPreviousRow();
                 m_currentRow->DrawCursor(window);
@@ -230,6 +238,13 @@ std::shared_ptr<Row> Page::GetNextRow(IGlyph::GlyphPtr& row)
     return std::static_pointer_cast<Row>(*std::next(rowIt));
 }
 
+Page::RowPtr Page::GetLastRow()
+{
+    assert(!m_components.empty() && "Page has no rows!");
+    return std::dynamic_pointer_cast<Row>(m_components.back());
+}
+
+
 void Page::MoveUpLowerRows(Gui::Window* window, std::list<IGlyph::GlyphPtr>::iterator startRowIt)
 {
     // Update the rows below
@@ -268,28 +283,77 @@ std::shared_ptr<Row> Page::RemoveFirstRow()
 
 void Page::ProcessBackspaceFromBeginning(Gui::Window* window)
 {
-    if(m_currentRow == m_components.front()) {
-        auto previousPage = m_parent->SwitchPage(window, TextView::SwitchDirection::kPrev, false);
-        //        if(previousPage) {
-        //            if(previousPage->IsFull()) {
-        //                m_parent->RemovePage(previousPage);
-        //                m_parent->SetCurrentPage(this);
-        //            }
-        //        }
+    std::shared_ptr<Row> previousRow;
 
-        m_currentRow->DrawCursor(window);
-        return;
+    auto previousPage = this;
+    auto currentRowIt = std::find(m_components.begin(), m_components.end(), m_currentRow);
+    if(m_currentRow == m_components.front()) {
+        previousPage = m_parent->GetPreviousPage(this).get();
+        if(!previousPage) {
+            return;
+        }
+
+        previousRow = previousPage->GetLastRow();
+        std::cout << "ASDASd" << previousPage->RowCanBeAdded(14) << std::endl;
+        // Insert empty row to the end of previous page
+        if(previousPage->RowCanBeAdded(m_currentRow->GetHeight()) && !m_currentRow->IsEmpty()) {
+            auto tmpRow = std::make_shared<Row>(previousRow->GetGlyphParams());
+            previousPage->InsertAfter(previousRow, tmpRow);
+            previousRow = tmpRow;
+        }
+    } else {
+        auto prevRowIt = std::prev(currentRowIt);
+        previousRow = std::static_pointer_cast<Row>(*prevRowIt);
     }
 
-    auto prevRowIt = std::prev(std::find(m_components.begin(), m_components.end(), m_currentRow));
-    auto previousRow = std::static_pointer_cast<Row>(*prevRowIt);
+    if(previousRow->IsEmpty() || m_currentRow->IsEmpty()) {
+        std::cout << "UNBELIB" << std::endl;
+        if(!m_currentRow->IsEmpty()) {
+            previousRow->Insert(m_currentRow);
+        }
 
-    if(m_currentRow->IsEmpty()) {
-        m_components.remove(m_currentRow);
-        m_currentRow = previousRow;
-        m_currentRow->DrawCursorAtEnd(window);
+        if(m_components.size() == 1) {
+            previousPage->SetCurrentRow(previousRow);
+            m_parent->SetCurrentPage(previousPage);
+            // TODO(rmn): dangerous!!!
+            m_parent->RemovePage(this);
+        } else {
+            for(auto it = std::next(currentRowIt); it != m_components.end(); ++it) {
+                (*it)->MoveGlyph(0, -(m_currentRow->GetHeight()));
+            }
 
-        MoveUpLowerRows(window, std::next(prevRowIt));
+            m_currentRow = std::static_pointer_cast<Row>(*(m_components.erase(currentRowIt)));
+            previousPage->SetCurrentRow(previousRow);
+            m_parent->SetCurrentPage(previousPage);
+
+            Page* currentPage = this;
+            auto nextPage = currentPage->m_parent->GetNextPage(this).get();
+            while(nextPage && !nextPage->IsEmpty()) {
+                // TODO(rmn): check if we can insert regarding of row size
+                auto nextPageFirstRow = nextPage->GetFirstRow();
+                auto deltaY = nextPageFirstRow->GetGlyphParams().y - currentPage->GetLastRow()->GetBottomBorder();
+                currentPage->Insert(nextPageFirstRow, currentPage->m_components.size());
+                nextPageFirstRow->MoveGlyph(0, -deltaY);
+                nextPage->m_components.pop_front();
+
+                if(nextPage->IsEmpty()) {
+                    currentPage->m_parent->RemovePage(nextPage);
+                    break;
+                }
+
+                for(auto&it: nextPage->m_components) {
+                    (*it).MoveGlyph(0, -(nextPageFirstRow->GetHeight()));
+                }
+
+                currentPage = nextPage;
+                nextPage = currentPage->m_parent->GetNextPage(currentPage).get();
+            }
+            if(nextPage && nextPage->IsEmpty()) {
+                currentPage->m_parent->RemovePage(nextPage);
+            }
+        }
+
+        m_parent->ReDraw(window);
         return;
     }
 
@@ -298,48 +362,48 @@ void Page::ProcessBackspaceFromBeginning(Gui::Window* window)
         auto removedElement = previousRow->GetLastChar();
 
         removedElement->SetChar(m_currentRow->GetFirstChar()->GetChar());
-        removedElement->ReDraw(window);
+        auto cursorParams = removedElement->GetGlyphParams();
+        Lexi::Cursor::Get().MoveCursor(window, cursorParams);
+        previousPage->SetCurrentRow(previousRow);
+        m_parent->SetCurrentPage(previousPage);
 
         m_currentRow->Remove(window, m_currentRow->GetFirstChar());
-        m_currentRow = previousRow;
-        m_currentRow->DrawCursor(window);
-    } else if(previousRow->IsEmpty()) {
-        MoveUpLowerRows(window, std::next(prevRowIt));
-        m_components.erase(prevRowIt);
-        m_currentRow->DrawCursor(window);
-    } else {
-        auto prevRowCapacity = previousRow->GetFreeSpace();
-        if(prevRowCapacity >= m_currentRow->GetUsedSpace()) {
-            m_currentRow->ClearGlyph(window);
-            window->FillRectangle(m_currentRow->GetGlyphParams(), Color::kWhite);
-            previousRow->Insert(m_currentRow);
-            // Removed last line in a page.
-            if(m_currentRow == m_components.back()) {
-                // Need to update all other pages
-                if(IsBottomRow(m_currentRow)) {
-                    auto nextPage = m_parent->GetNextPage(this);
-                    if(!nextPage->IsEmpty()) {
-                        m_currentRow->ReWrite(nextPage->RemoveFirstRow());
-                    }
-
-                    if(nextPage->IsEmpty()) {
-                        m_parent->RemovePage(nextPage);
-                    }
-                } else {
-                    m_components.remove(m_currentRow);
-                }
-
-                m_currentRow->Draw(window);
-                m_currentRow = previousRow;
-                m_currentRow->DrawCursorAtEnd(window);
-            }
-        } else {
-            auto lst = m_currentRow->Cut(m_currentRow->GetPosition().x, prevRowCapacity);
-            previousRow->Insert(previousRow->GetLastChar()->GetRightBorder(), std::move(lst));
-            m_currentRow = previousRow;
-            m_currentRow->DrawCursor(window);
-        }
+        previousRow->ReDraw(window);
+        previousRow->DrawCursor(window);
     }
+//    } else {
+//        auto prevRowCapacity = previousRow->GetFreeSpace();
+//        if(prevRowCapacity >= m_currentRow->GetUsedSpace()) {
+//            m_currentRow->ClearGlyph(window);
+//            window->FillRectangle(m_currentRow->GetGlyphParams(), Color::kWhite);
+//            previousRow->Insert(m_currentRow);
+//            // Removed last line in a page.
+//            if(m_currentRow == m_components.back()) {
+//                // Need to update all other pages
+//                if(IsBottomRow(m_currentRow)) {
+//                    auto nextPage = m_parent->GetNextPage(this);
+//                    if(!nextPage->IsEmpty()) {
+//                        m_currentRow->ReWrite(nextPage->RemoveFirstRow());
+//                    }
+//
+//                    if(nextPage->IsEmpty()) {
+//                        m_parent->RemovePage(nextPage);
+//                    }
+//                } else {
+//                    m_components.remove(m_currentRow);
+//                }
+//
+//                m_currentRow->Draw(window);
+//                m_currentRow = previousRow;
+//                m_currentRow->DrawCursorAtEnd(window);
+//            }
+//        } else {
+//            auto lst = m_currentRow->Cut(m_currentRow->GetPosition().x, prevRowCapacity);
+//            previousRow->Insert(previousRow->GetLastChar()->GetRightBorder(), std::move(lst));
+//            m_currentRow = previousRow;
+//            m_currentRow->DrawCursor(window);
+//        }
+//    }
 }
 
 void Page::Insert(GlyphPtr glyph, size_t position)
@@ -357,5 +421,11 @@ void Page::Insert(GlyphPtr glyph, size_t position)
 
 bool Page::IsFull() const
 {
-    return m_components.back()->GetPosition().y + Lexi::FontManager::Get().GetCharWidth() >= GetBottomBorder();
+    return m_components.back()->GetPosition().y + Lexi::FontManager::Get().GetCharWidth() >=
+        GetBottomBorder() - m_botIndent;
+}
+
+[[nodiscard]] bool Page::RowCanBeAdded(height_t height) const
+{
+    return m_components.back()->GetBottomBorder() + height < GetBottomBorder() - m_botIndent;
 }
