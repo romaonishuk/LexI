@@ -225,6 +225,15 @@ std::optional<ICompositeGlyph::GlyphList> Row::Insert(std::shared_ptr<Row>&& row
     return Insert(position, std::move(std::move(row->m_components)));
 }
 
+std::optional<ICompositeGlyph::GlyphList> Row::InsertBack(std::list<GlyphPtr>&& list)
+{
+    auto insertPosition = m_params.x;
+    if(!m_components.empty()) {
+        insertPosition = m_components.back()->GetRightBorder();
+    }
+    return Insert(insertPosition, std::move(list));
+}
+
 std::optional<ICompositeGlyph::GlyphList> Row::Insert(size_t insertPosition, std::list<GlyphPtr>&& itemsToInsert)
 {
     auto updateElements = [&](width_t offset){

@@ -19,13 +19,29 @@
 Projects functionality(in Gif format) across the versions
 
 ## In Progress
-- Finishing text editor
+- ~~Finishing text editor~~ (Finished basic functionality)
+- Migration to Windows
 
 ## TODO List
 - use only smart pointers
 - migrate to a Windows(which includes expansion of WindowSystemFactory)
-- add importatnt glyphs as text editor
+- add important glyphs as text editor
 - appropriate processing of all fonts(now only mono is supported)
+
+## HowTo
+Build Lexi:
+```shell
+cmake %path_to_lexi
+make
+```
+
+**Linux build troubleshooting**
+
+I'm using X11 library for basic graphic operation. If it is not installed in Your system, You can install it:
+```shell
+sudo apt install libx11-dev
+```
+
 
 ## Discussion
 - Pls let me know if I'm violating some property rights (romaonishuk@gmail.com)

@@ -41,6 +41,12 @@ public:
     using ICompositeGlyph::Insert;
     std::optional<GlyphList> Insert(std::shared_ptr<Row>& row);
     std::optional<ICompositeGlyph::GlyphList> Insert(std::shared_ptr<Row>&& row);
+    /**
+     * Insert @p list to the end of the row using Insert(insertPosition, ..)
+     * @param list List to insert.
+     * @return
+     */
+    std::optional<GlyphList> InsertBack(std::list<GlyphPtr>&& list);
     std::optional<GlyphList> Insert(size_t insertPosition, std::list<GlyphPtr>&&);
 
     void ReWrite(std::shared_ptr<Row>&& row);

@@ -16,7 +16,7 @@
 #include "text_view.hpp"
 #include "window.hpp"
 
-const auto Version = "Lexi v1.0";
+const auto Version = "Lexi v1.1";
 
 #include <array>
 const std::array supportedFontSizes = {
