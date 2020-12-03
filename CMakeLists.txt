@@ -28,6 +28,12 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
     add_subdirectory(src/lexi_linux)
 
     target_link_libraries(${PROJECT_NAME} PRIVATE lexi_linux)
+elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+    add_subdirectory(src/lexi_windows)
+
+    target_link_libraries(${PROJECT_NAME} PUBLIC lexi_windows)
+    # TODO(rmn): cmake bug? no lexi_windows/inc in lexi_windows interface includes
+    target_include_directories(${PROJECT_NAME} PRIVATE /src/lexi_windows/inc)
 else ()
     message(FATAL "Unsupported System")
 endif ()

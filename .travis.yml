@@ -5,6 +5,9 @@ compiler:
 - gcc
 os:
 - linux
+- windows
+before_install:
+  - if [ $TRAVIS_OS_NAME == "windows" ]; then export MAKE=MAKE=mingw32-make fi
 script:
   - mkdir -p build
   - cd build
@@ -13,4 +16,5 @@ script:
 
 after_success:
   - cd ..
-  - rm -rf build
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then rm -rf build; fi
+  - if [ "$TRAVIS_OS_NAME" = "windows" ]; then rd /s /q build; fi

@@ -2,8 +2,7 @@
 // Created by romaonishuk on 27.10.19.
 //
 
-#include "i_command.hpp"
-#include "config.hpp"
+#include <i_command.hpp>
 #include "button.hpp"
 #include "decorator.hpp"
 #include "event_manager.hpp"
@@ -21,7 +20,7 @@
 const std::array supportedFontSizes = {
     "10", "10,5", "11", "12", "14", "16", "18", "20", "22", "32", "48", "54", "72", "96"};
 
-int main(int argc, char *argv[])
+int main()
 {
     using Lexi::FontManager;
     using Lexi::Config;
