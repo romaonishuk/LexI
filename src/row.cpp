@@ -380,7 +380,7 @@ ICompositeGlyph::GlyphList Row::Cut(size_t startPosition, size_t pixelsCount)
     }
 
     auto cutWidth = std::accumulate(result.begin(), result.end(), 0, [](auto& init, const auto& item) {
-        init += item->GetWidth() + 1;
+        init += item->GetWidth();
         return init;
     });
 

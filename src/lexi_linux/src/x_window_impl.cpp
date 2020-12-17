@@ -199,7 +199,9 @@ void XWindowImpl::SetFontPath(const std::string& path)
     for(int i = 0; i < fontsCount; ++i) {
         v.push_back(currentPath[i]);
     }
-    v.push_back(const_cast<char*>(path.c_str()));
+    if(!path.empty()) {
+        v.push_back(const_cast<char*>(path.c_str()));
+    }
 
     XSetFontPath(m_display, v.data(), v.size());
     XFreeFontPath(currentPath);

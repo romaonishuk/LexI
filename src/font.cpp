@@ -4,6 +4,8 @@
 
 #include "font.hpp"
 
+#include "config.hpp"
+
 // --- Font Manager ---
 namespace Lexi {
 FontManager& FontManager::Get()
@@ -15,7 +17,7 @@ FontManager& FontManager::Get()
 void FontManager::Init(Gui::Window* w)
 {
     impl = w->GetImpl();
-    impl->SetFontPath(path);
+    impl->SetFontPath(Lexi::Config::GetFontsPath());
 
     m_existingFonts = impl->GetFontList();
     std::cout << "Successfully loaded " << m_existingFonts.size() << " fonts!" << std::endl;

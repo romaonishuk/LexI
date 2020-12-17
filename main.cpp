@@ -2,7 +2,8 @@
 // Created by romaonishuk on 27.10.19.
 //
 
-#include <i_command.hpp>
+#include "i_command.hpp"
+#include "config.hpp"
 #include "button.hpp"
 #include "decorator.hpp"
 #include "event_manager.hpp"
@@ -16,14 +17,15 @@
 #include "text_view.hpp"
 #include "window.hpp"
 
-const auto Version = "Lexi v1.1";
-
 #include <array>
 const std::array supportedFontSizes = {
     "10", "10,5", "11", "12", "14", "16", "18", "20", "22", "32", "48", "54", "72", "96"};
 
-int main()
+int main(int argc, char *argv[])
 {
+    using Lexi::FontManager;
+    using Lexi::Config;
+
     // Create window
     GlyphParams initial_window_params;
     initial_window_params.x = 0;
@@ -35,10 +37,10 @@ int main()
     EventManager eventManager(&window);
     eventManager.addWindow(&window);
 
-    Lexi::FontManager::Get().Init(&window);
+    FontManager::Get().Init(&window);
 
     const auto defaultFont = "clean";  //"Ubuntu Mono";
-    Lexi::FontManager::Get().SetFont(defaultFont);
+    FontManager::Get().SetFont(defaultFont);
 
     auto top_panel =
         std::make_shared<BorderDecorator>(GlyphParams{0, 0, initial_window_params.width, 50}, Color::kWhite);
@@ -72,7 +74,7 @@ int main()
 
     auto bottom_panel =
         std::make_shared<BorderDecorator>(GlyphParams{0, 940, initial_window_params.width, 20}, Color::kBlack);
-    auto status_line = std::make_shared<TextLabel>(GlyphParams{10, 955, 100, 20}, Version);
+    auto status_line = std::make_shared<TextLabel>(GlyphParams{10, 955, 100, 20}, Config::get().GetSoftInfo());
     bottom_panel->Add(status_line);
     window.Add(bottom_panel);
 
@@ -90,7 +92,7 @@ int main()
         bottom_panel->Draw(&window);
     });
 
-    for(const auto& it: Lexi::FontManager::Get().GetFontList()) {
+    for(const auto& it: FontManager::Get().GetFontList()) {
         auto menuItem = std::make_shared<Gui::MenuItem>(it);
         fontsMenu->Add(menuItem);
         menuItem->SetOnFocusedAction([&, it] {
@@ -98,12 +100,12 @@ int main()
             status_line->ChangeText(it, &window);
             bottom_panel->Draw(&window);
         });
-        menuItem->SetOnButtonPressedAction([&, it] { Lexi::FontManager::Get().SetFont(it); });
+        menuItem->SetOnButtonPressedAction([&, it] { FontManager::Get().SetFont(it); });
     }
 
     for(const auto& it: supportedFontSizes) {
         auto item = std::make_shared<Gui::MenuItem>(it);
-        item->SetOnButtonPressedAction([it] { Lexi::FontManager::Get().SetFontSize(it); });
+        item->SetOnButtonPressedAction([it] { FontManager::Get().SetFontSize(it); });
         fontSizeMenu->Add(std::move(item));
     }
 

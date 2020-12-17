@@ -4,7 +4,14 @@ project(LexI)
 set(CMAKE_CXX_STANDARD 17)
 
 # TODO(rmn): sanitizers
-set(CMAKE_CXX_FLAGS "-O3 -Werror -Wall -Wno-narrowing -Wno-sign-compare -Wno-unused-variable")  # TODO(rmn): remove Wno
+if (${CMAKE_BUILD_TYPE} STREQUAL "Release")
+    set(CMAKE_CXX_FLAGS "-O3")
+else()
+    set(CMAKE_CXX_FLAGS "-O0")
+endif()
+# TODO(rmn): remove Wno
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wno-narrowing -Wno-sign-compare -Wno-unused-variable")
+message(${CMAKE_CXX_FLAGS})
 
 # interface lib
 add_library(lexi_interface INTERFACE)
@@ -23,4 +30,9 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
     target_link_libraries(${PROJECT_NAME} PRIVATE lexi_linux)
 else ()
     message(FATAL "Unsupported System")
+endif ()
+
+# TODO(rmn): add installation rules
+if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+    file(COPY "${PROJECT_SOURCE_DIR}/resources" DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 endif ()

@@ -1,7 +1,9 @@
 # C++ implementation of Lexi
 
 **Lexi** - WYSIWYG text editor described in second chapter of [Design Patterns: Elements of Reusable Object-Oriented Software](https://en.wikipedia.org/wiki/Design_Patterns)
+
 **Motivation** - I've been reading the book(as most of you) and faced the questions like "How this pattern is implemented?" or "Is there an open-source implementation of Lexi?". After searching internet for the answers I decided to implement it all by myself.
+
 **Note**: Even though I've tried to implement stuff as described in the book, there are differences that I'll try to describe in the future.
 
 ## Pattern referencing

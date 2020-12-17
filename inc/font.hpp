@@ -5,15 +5,12 @@
 #ifndef LEXI_FONT_HPP
 #define LEXI_FONT_HPP
 
+#include "config.hpp"
 #include "common.hpp"
 #include "window.hpp"
 #include "window_impl.hpp"
 
 #include <set>
-
-namespace {
-const auto path = "/home/ronyshchuk/Desktop/LexI/resources/fonts";
-}
 
 namespace Lexi {
 struct FontName
