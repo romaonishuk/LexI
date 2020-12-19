@@ -21,18 +21,19 @@ class Window;
 class EventManager
 {
 public:
-    explicit EventManager(Gui::Window* window);
+    explicit EventManager();
     void RunLoop();
     void Stop();
     void addWindow(Gui::Window* w) { childWindows.push_back(w); }
+    void setMainWindow(Gui::Window* window){m_mainWindow = window;}
 
 private:
     void ProcessCursorRelatedEvent(const Lexi::Event&);
 
     //    std::queue<std::unique_ptr<IEvent>> m_queue;
     std::vector<Gui::Window*> childWindows;
-    Gui::Window* m_mainWindow;
-    Gui::Window* m_currentWindow;
+    Gui::Window* m_mainWindow = nullptr;
+    Gui::Window* m_currentWindow = nullptr;
     bool stopLoop = false;
 
     bool ChangeCurrentWindow(unsigned long window);

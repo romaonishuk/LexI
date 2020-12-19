@@ -13,7 +13,7 @@
 namespace Gui {
 Window::Window(const GlyphParams& params): ICompositeGlyph(params)
 {
-    m_window_impl = WindowSystemFactory::Get().MakeWindowImpl(params);
+    m_window_impl = WindowSystemFactory::MakeWindowImpl(params);
     assert(m_window_impl);
 }
 

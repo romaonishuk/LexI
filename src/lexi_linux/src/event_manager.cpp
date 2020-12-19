@@ -11,10 +11,10 @@
 #include <iostream>
 
 #include "cursor.hpp"
-#include "lexi_linux/inc/x_window_impl.hpp"
+#include "x_window_impl.hpp"
 #include "window.hpp"
 
-EventManager::EventManager(Gui::Window* w): m_mainWindow(w), m_currentWindow(nullptr)
+EventManager::EventManager()
 {}
 
 bool EventManager::ChangeCurrentWindow(unsigned long window)
