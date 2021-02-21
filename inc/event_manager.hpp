@@ -17,17 +17,25 @@ namespace Gui {
 class Window;
 }
 
-// TODO(rmn): make singleton
 class EventManager
 {
 public:
-    explicit EventManager();
     void RunLoop();
     void Stop();
     void addWindow(Gui::Window* w) { childWindows.push_back(w); }
-    void setMainWindow(Gui::Window* window){m_mainWindow = window;}
+    void setMainWindow(Gui::Window* window){m_mainWindow = window; m_currentWindow = m_mainWindow;}
+
+    static EventManager& Get();
+
+    // TODO(rmn): make this protected after EventManagerImpl implemented
+    [[nodiscard]] Gui::Window* GetCurrentWindow() const {
+        return m_currentWindow;
+    }
 
 private:
+    explicit EventManager();
+    ~EventManager() = default;
+
     void ProcessCursorRelatedEvent(const Lexi::Event&);
 
     //    std::queue<std::unique_ptr<IEvent>> m_queue;
@@ -37,6 +45,9 @@ private:
     bool stopLoop = false;
 
     bool ChangeCurrentWindow(unsigned long window);
+
+//    struct EventManagerImpl;
+//    std::unique_ptr<EventManagerImpl> m_impl;
 };
 
 #endif  // LEXI_EVENT_MANAGER_HPP

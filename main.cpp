@@ -32,7 +32,7 @@ int main(int argv, char** argc)
     initial_window_params.width = 1920;
     initial_window_params.height = 1080;
 
-    EventManager eventManager;
+    auto& eventManager = EventManager::Get();
     Gui::Window window(initial_window_params);
     eventManager.setMainWindow(&window);
     eventManager.addWindow(&window);
@@ -53,16 +53,16 @@ int main(int argv, char** argc)
 //    fileMenu->Add(quitMenuItem);
 //    top_panel->Add(fileMenu);
 //    eventManager.addWindow(fileMenu->getMenuWindow());
-//
-//    top_panel->Add(std::make_shared<Button>(GlyphParams{95, 5, 80, 40}, "Edit"));
-//    top_panel->Add(std::make_shared<Button>(GlyphParams{275, 5, 80, 40}, "Symbol"));
-//
-//    auto text_view = std::make_shared<TextView>(GlyphParams{360, 100, 1200, 800}, &window);
-//    window.Add(text_view);
-//    eventManager.addWindow(text_view.get());
-//
-//    auto scroll_board = std::make_shared<Scroller>(GlyphParams{1895, 100, 20, 800}, text_view);
-//    window.Add(scroll_board);
+
+    top_panel->Add(std::make_shared<Button>(GlyphParams{95, 5, 80, 40}, "Edit"));
+    top_panel->Add(std::make_shared<Button>(GlyphParams{275, 5, 80, 40}, "Symbol"));
+
+    auto text_view = std::make_shared<TextView>(GlyphParams{360, 100, 1200, 800}, &window);
+    window.Add(text_view);
+    eventManager.addWindow(text_view.get());
+
+    auto scroll_board = std::make_shared<Scroller>(GlyphParams{1895, 100, 20, 800}, text_view);
+    window.Add(scroll_board);
 //
 //    auto fontsMenu = std::make_shared<Gui::Menu>(GlyphParams{185, 5, 80, 40}, "Fonts", &window);
 //    top_panel->Add(fontsMenu);

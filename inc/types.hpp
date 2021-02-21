@@ -49,6 +49,7 @@ struct GlyphParams
 
     GlyphParams() = default;
     GlyphParams(int32_t _x, int32_t _y, width_t w, height_t h): x(_x), y(_y), width(w), height(h) {}
+    GlyphParams(const Point&p, width_t w, height_t h): x(p.x), y(p.y), width(w), height(h) {}
 
     bool IsIntersects(const Point& p) const noexcept
     {

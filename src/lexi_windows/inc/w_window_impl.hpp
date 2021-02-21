@@ -52,6 +52,7 @@ public:
 
 private:
     HWND m_handler;
+    HDC m_deviceCtx;
 };
 }
 
