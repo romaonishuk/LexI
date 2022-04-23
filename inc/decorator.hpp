@@ -36,12 +36,13 @@ public:
 
     void DrawBorder(Gui::Window* w)
     {
+        w->SetForeground(m_color);
+        w->DrawRectangle({m_params.x, m_params.y}, m_params.width, m_params.height);
+
+        // TODO(rmn): test on Linux
         for(const auto& it: m_components) {
             it->Draw(w);
         }
-
-        w->SetForeground(m_color);
-        w->DrawRectangle({m_params.x, m_params.y}, m_params.width, m_params.height);
     }
 
 private:

@@ -72,11 +72,11 @@ int main(int argv, char** argc)
 //    top_panel->Add(fontSizeMenu);
 //    eventManager.addWindow(fontSizeMenu->getMenuWindow());
 //
-//    auto bottom_panel =
-//        std::make_shared<BorderDecorator>(GlyphParams{0, 940, initial_window_params.width, 20}, Color::kBlack);
-//    auto status_line = std::make_shared<TextLabel>(GlyphParams{10, 955, 100, 20}, Config::get().GetSoftInfo());
-//    bottom_panel->Add(status_line);
-//    window.Add(bottom_panel);
+    auto bottom_panel =
+        std::make_shared<BorderDecorator>(GlyphParams{0, 940, initial_window_params.width, 20}, Color::kBlack);
+    auto status_line = std::make_shared<TextLabel>(GlyphParams{10, 955, 100, 20}, Config::get().GetSoftInfo());
+    bottom_panel->Add(status_line);
+    window.Add(bottom_panel);
 //
 //    // Actions
 //    openMenuItem->SetOnFocusedAction([&] {

@@ -38,7 +38,15 @@ struct Point
     Point(int32_t _x, int32_t _y): x(_x), y(_y) {}
 
     bool operator==(const Point& rhs) { return x == rhs.x && y == rhs.y; }
+
+    friend std::ostream& operator<<(std::ostream& os, const Point& dt);
 };
+
+inline std::ostream& operator<<(std::ostream& os, const Point& point)
+{
+    os << "x: " << point.x << " y: " << point.y ;
+    return os;
+}
 
 struct GlyphParams
 {
