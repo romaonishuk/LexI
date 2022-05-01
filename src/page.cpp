@@ -22,8 +22,8 @@ using Lexi::FontManager;
 Page::Page(TextView* parent, const GlyphParams& params): ICompositeGlyph(params), m_parent(parent)
 {
     m_currentRow = std::make_shared<Row>(
-        GlyphParams{m_leftIndent, m_params.y + m_topIndent + FontManager::Get().GetCharHeight(),
-            m_params.width - m_leftIndent - m_rightIndent, FontManager::Get().GetCharHeight()});
+        GlyphParams{m_leftIndent, static_cast<int32_t>(m_params.y + m_topIndent + FontManager::Get().GetCharHeight()),
+            m_params.width - m_leftIndent - m_rightIndent, static_cast<height_t>(FontManager::Get().GetCharHeight())});
     ICompositeGlyph::Add(m_currentRow);
 }
 
@@ -63,8 +63,8 @@ void Page::ProcessCharacterShift(std::shared_ptr<Row>& row, IGlyph::GlyphPtr& ne
             nextPage->SetCurrentRow(nextRow);
         } else {
             nextRow = std::make_shared<Row>(
-                GlyphParams{m_leftIndent, row->GetPosition().y + FontManager::Get().GetCharHeight(),
-                    m_params.width - m_leftIndent - m_rightIndent, FontManager::Get().GetCharHeight()});
+                GlyphParams{m_leftIndent, static_cast<int32_t>(row->GetPosition().y + FontManager::Get().GetCharHeight()),
+                    m_params.width - m_leftIndent - m_rightIndent, static_cast<height_t>(FontManager::Get().GetCharHeight())});
             ICompositeGlyph::Add(nextRow);
         }
     } else {
@@ -92,7 +92,7 @@ void Page::ProcessCharacterShift(std::shared_ptr<Row>& row, IGlyph::GlyphPtr& ne
 void Page::ProcessEvent(Gui::Window* window, const Event& event)
 {
     // TODO(rmn): oh my, need to add event/notification mechanism
-    const auto* key = static_cast<const Lexi::KeyBoardEvent*>(&event);
+    const auto* key = dynamic_cast<const Lexi::KeyBoardEvent*>(&event);
     auto& cursor = Lexi::Cursor::Get();
 
     if(key->IsString()) {

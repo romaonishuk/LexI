@@ -8,12 +8,15 @@
 #include "window_impl.hpp"
 #include "font.hpp"
 
-#include <windef.h>
+#include<windows.h>
+// TODO(rmn): check if there any bad consequences
+#undef DrawText
 
 namespace Gui {
 class WWindowImpl : public WindowImpl {
 public:
     explicit WWindowImpl(const GlyphParams &);
+    explicit WWindowImpl(const GlyphParams &, WWindowImpl* parentImpl);
 
     ~WWindowImpl() override;
 
@@ -53,6 +56,8 @@ public:
 private:
     HWND m_handler;
     HDC m_deviceCtx;
+
+    bool m_isChild{false};
 };
 }
 

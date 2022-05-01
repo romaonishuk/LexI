@@ -27,6 +27,6 @@ std::unique_ptr<Gui::WindowImpl> WindowSystemFactory::MakeChildWindowImpl(
 #if defined  __linux__
     return std::make_unique<Gui::XWindowImpl>(params, dynamic_cast<Gui::XWindowImpl*>(windowImpl));
 #else
-    return std::make_unique<Gui::WWindowImpl>(params);
+    return std::make_unique<Gui::WWindowImpl>(params, dynamic_cast<Gui::WWindowImpl*>(windowImpl));
 #endif
 }

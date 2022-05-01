@@ -14,11 +14,11 @@ void Character::Draw(Gui::Window* window)
     // calibrating position in respect to baseline  - Lexi::FontManager::Get().GetCharDescent()
     // TODO(rmn): fonting fonts!
     window->DrawText(
-        {m_params.x, m_params.y + m_params.height - Lexi::FontManager::Get().GetCharDescent()}, {m_symbol});
+        {m_params.x, static_cast<int32_t>(m_params.y + m_params.height - Lexi::FontManager::Get().GetCharDescent())}, {m_symbol});
 }
 
 void Character::DrawAt(Gui::Window* window, const Point& point)
 {
     window->SetForeground(kBlack);
-    window->DrawText({point.x, point.y + Lexi::FontManager::Get().GetCharAscent()}, {m_symbol});
+    window->DrawText({point.x, static_cast<int32_t>(point.y + Lexi::FontManager::Get().GetCharAscent())}, {m_symbol});
 }

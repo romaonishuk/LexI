@@ -184,7 +184,7 @@ std::optional<IGlyph::GlyphPtr> Row::AddCharacter(char c)
     auto* window = cursor.GetCurrentWindow();
 
     // TODO(rmn): move
-    auto newChar = std::make_shared<Character>(GlyphParams{m_params.x, m_params.y, charWidth, charHeight}, c);
+    auto newChar = std::make_shared<Character>(GlyphParams{m_params.x, m_params.y, static_cast<width_t>(charWidth), static_cast<height_t>(charHeight)}, c);
     auto poppedElement = InsertChar(window, newChar, cursor.GetPosition());
 
     cursor.MoveCursor(window, {newChar->GetRightBorder(), m_params.y, cursorWidth, m_params.height});

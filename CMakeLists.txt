@@ -4,13 +4,26 @@ project(LexI)
 set(CMAKE_CXX_STANDARD 17)
 
 # TODO(rmn): sanitizers
-if (${CMAKE_BUILD_TYPE} STREQUAL "Release")
-    set(CMAKE_CXX_FLAGS "-O3")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    if (${CMAKE_BUILD_TYPE} STREQUAL "Release")
+        set(CMAKE_CXX_FLAGS "/O2")
+    else()
+        set(CMAKE_CXX_FLAGS "/Od")
+    endif()
+
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WL /analyze /EHsc /wd4623 /wd4838")
 else()
-    set(CMAKE_CXX_FLAGS "-O0")
+    if (${CMAKE_BUILD_TYPE} STREQUAL "Release")
+        set(CMAKE_CXX_FLAGS "-O3")
+    else()
+        set(CMAKE_CXX_FLAGS "-O0")
+    endif()
+
+    # TODO(rmn): remove Wno
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wno-sign-compare -Wno-unused-variable")
+
 endif()
-# TODO(rmn): remove Wno
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wno-narrowing -Wno-sign-compare -Wno-unused-variable")
+
 message(${CMAKE_CXX_FLAGS})
 
 # interface lib
@@ -33,7 +46,7 @@ elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
 
     target_link_libraries(${PROJECT_NAME} PUBLIC lexi_windows)
     # TODO(rmn): cmake bug? no lexi_windows/inc in lexi_windows interface includes
-    target_include_directories(${PROJECT_NAME} PRIVATE /src/lexi_windows/inc)
+    target_include_directories(${PROJECT_NAME} PRIVATE src/lexi_windows/inc)
 else ()
     message(FATAL "Unsupported System")
 endif ()

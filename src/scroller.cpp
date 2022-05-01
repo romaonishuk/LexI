@@ -92,7 +92,7 @@ void Scroller::UpdateScaling()
 
 void Scroller::UpdateScrollerPosition(Gui::Window* w)
 {
-    m_scrollButton->SetPosition({m_scrollButton->GetPosition().x, m_params.y + m_view->GetVisibleArea().y * m_scale});
+    m_scrollButton->SetPosition({m_scrollButton->GetPosition().x, static_cast<int32_t>(m_params.y + m_view->GetVisibleArea().y * m_scale)});
     ReDraw(w);
 }
 

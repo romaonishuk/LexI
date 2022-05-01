@@ -11,9 +11,6 @@
 #include <winuser.h>
 
 
-// TODO(rmn): check if there any bad consequences
-#undef DrawText
-
 namespace {
 uint32_t ConvertAlignment(Alignment alignment) {
     switch(alignment) {
@@ -53,6 +50,31 @@ WWindowImpl::WWindowImpl(const GlyphParams& params)
     }
 
     ::ShowWindow(m_handler, SW_SHOWNORMAL);
+}
+
+WWindowImpl::WWindowImpl(const GlyphParams& params, WWindowImpl* parentImpl)
+{
+    using Lexi::Windows::GetLastErrorAsString;
+
+    m_isChild = true;
+    auto hInstance = GetModuleHandle(nullptr);
+    m_handler = ::CreateWindow(Lexi::Config::GetName(), "Child window",
+        WS_POPUP, params.x, params.y, params.width, params.height,
+        nullptr, nullptr, hInstance, this // LPVOID    lpParam
+    );
+
+    if(m_handler == nullptr) {
+        std::cout << "Error during window creation: " << GetLastErrorAsString() << std::endl;
+        throw std::runtime_error("Failed to create window!");
+    }
+
+    m_deviceCtx = ::GetDC(m_handler);
+    if(!m_deviceCtx) {
+        std::cout << "Failed to get device context: " << GetLastErrorAsString() << std::endl;
+        throw std::runtime_error("Failed to get device context!");
+    }
+
+    ::SetParent(m_handler, parentImpl->m_handler);
 }
 
 WWindowImpl::~WWindowImpl()
@@ -110,12 +132,12 @@ void WWindowImpl::FillRectangle(const Point &point, const width_t width, const h
 
 void WWindowImpl::ShowWindow()
 {
-    ::ShowWindow(m_handler, false);
+    ::ShowWindow(m_handler, SW_SHOWNORMAL);
 }
 
 void WWindowImpl::HideWindow()
 {
-    std::cout << __FUNCTION__ << " not yet implemented!" << std::endl;
+    ::ShowWindow(m_handler, SW_HIDE);
 }
 
 void WWindowImpl::ClearWindow()
